@@ -6,7 +6,7 @@
 [![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-2.0+-red)](https://www.sqlalchemy.org/)
 [![Docker](https://img.shields.io/badge/Docker-Latest-blue)](https://www.docker.com/)
 
-![Project Screenshot Placeholder](https://i.imgur.com/fNqeFgt.png)
+![Project Screenshot Placeholder](https://i.imgur.com/sFaMPUG.png)
 
 This is a Telegram bot designed to help students and staff of UkrDUZT access their university schedule easily. The bot provides quick and intuitive access to schedules directly within Telegram.
 
@@ -26,7 +26,7 @@ Follow these steps to set up and run the project:
 Ensure you have the following installed on your system:
 
 - Python 3.12
-- Docker and Docker Compose
+- Docker
 - Git
 
 ### Steps
@@ -54,7 +54,11 @@ Ensure you have the following installed on your system:
 4. **Set Up Environment Variables**
 
    Rename the `.env.example` file to `.env` and replace the placeholder values with your own data:
-
+   
+      ```bash
+   mv .env.example .env
+   ```   
+   
    Example `.env` file:
    ```env
    BOT_TOKEN=1234567890:abcdefghijklmnopqrstuvwxyz
@@ -77,10 +81,25 @@ Ensure you have the following installed on your system:
    cd ukrduzt-v2-bot
    ```
 
-2. **Run the Container**
+2. **Set Up Environment Variables**
+
+   Rename the `.env.example` file to `.env` and replace the placeholder values with your own data:
+   
+   ```bash
+   mv .env.example .env
+   ```   
+
+   Example `.env` file:
+   ```env
+   BOT_TOKEN=1234567890:abcdefghijklmnopqrstuvwxyz
+   ADMIN=1234567890
+   ```
+
+3. **Run the Container**
 
    ```bash
-   docker-compose up --build
+   docker compose up -d --build
+   docker ps
    ```
 
 ## Contributing

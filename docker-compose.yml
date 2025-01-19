@@ -1,17 +1,8 @@
 services:
-  bot:
-    build:
-      context: .
-    container_name: ukrduzt_v2_bot
-    env_file:
-      - .env
-    depends_on:
-      - db
-    restart: unless-stopped
-
   db:
-    image: postgres:16-alpine
+    image: postgres:15-alpine
     container_name: postgres_db
+    hostname: db
     volumes:
       - postgres_data:/var/lib/postgresql/data
     env_file:
@@ -19,6 +10,16 @@ services:
     restart: on-failure
     ports:
       - "5432:5432"
+
+  bot:
+    build:
+      dockerfile: Dockerfile
+    container_name: ukrduzt_v2_bot
+    env_file:
+      - .env
+    depends_on:
+      - db
+    restart: unless-stopped
 
 volumes:
   postgres_data:
