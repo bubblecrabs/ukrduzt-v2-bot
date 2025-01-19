@@ -4,6 +4,7 @@
 [![Aiohttp](https://img.shields.io/badge/Aiohttp-3.11+-blue)](https://docs.aiohttp.org/)
 [![Pydantic](https://img.shields.io/badge/Pydantic-2.10+-red)](https://docs.pydantic.dev/)
 [![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-2.0+-red)](https://www.sqlalchemy.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue)](https://www.postgresql.org/)
 [![Docker](https://img.shields.io/badge/Docker-Latest-blue)](https://www.docker.com/)
 
 ![Project Screenshot Placeholder](https://i.imgur.com/sFaMPUG.png)

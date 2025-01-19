@@ -1,6 +1,5 @@
-from urllib.parse import quote
 from pydantic_settings import BaseSettings
-from pydantic import Field, SecretStr, computed_field
+from pydantic import Field, SecretStr
 
 class Config(BaseSettings):
     # Bot settings
@@ -20,16 +19,6 @@ class Config(BaseSettings):
     postgres_db: str = Field(alias="POSTGRES_DB")
     postgres_user: str = Field(alias="POSTGRES_USER")
     postgres_password: SecretStr = Field(alias="POSTGRES_PASSWORD")
-
-    @computed_field
-    def postgres_dsn(self) -> str:
-        """Computes the PostgreSQL DSN string and returns it for use in database connection."""
-        encoded_password = quote(self.postgres_password.get_secret_value(), safe='')
-        return (
-            f"postgresql+asyncpg://{self.postgres_user}:"
-            f"{encoded_password}@"
-            f"{self.postgres_host}:{self.postgres_port}/{self.postgres_db}"
-        )
 
     class Config:
         env_file = ".env"
