@@ -2,8 +2,7 @@ from aiogram import Router, F
 from aiogram.types import CallbackQuery, InlineKeyboardMarkup
 
 from bot.keyboards.inline import admin_kb
-from bot.database.requests import db_count_users
-
+from bot.models.requests import db_count_users
 from bot.config import config
 
 router = Router()

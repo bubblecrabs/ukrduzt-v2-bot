@@ -8,7 +8,7 @@ from aiogram.fsm.storage.memory import MemoryStorage
 
 from bot.config import config
 from bot.handlers import get_routers
-from bot.database.models import async_init_db
+from bot.models.db import async_init_db
 
 # Set up logging for the bot
 logging.basicConfig(level=config.logging_level)

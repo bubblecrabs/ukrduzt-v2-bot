@@ -13,8 +13,17 @@ def get_current_week() -> str:
 
 def replace_numbers(text: str) -> str:
     """Replace numbers in the text with corresponding emoji numbers."""
-    replacements = {'1': '1️⃣', '2': '2️⃣', '3': '3️⃣', '4': '4️⃣', '5': '5️⃣'}
-    return ''.join(replacements.get(c, c) for c in text)
+    replacements = {
+        '1': '1️⃣', '2': '2️⃣', '3': '3️⃣', '4': '4️⃣', '5': '5️⃣',
+        '6': '6️⃣', '7': '7️⃣', '8': '8️⃣', '9': '9️⃣', '10': '🔟'
+    }
+    words = text.split()
+    replaced_words = [
+        replacements.get(word, ''.join(replacements.get(c, c) for c in word))
+        for word in words
+    ]
+    return ' '.join(replaced_words)
+
 
 
 def check_week_and_day(week: str, day: str, res_text: dict) -> tuple[dict[str, str], bool]:

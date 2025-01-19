@@ -1,8 +1,8 @@
 from collections.abc import Sequence
-
 from sqlalchemy import select, func
 
-from bot.database.models import User, async_session
+from bot.models.db import async_session
+from bot.models.user import User
 
 
 async def db_count_users() -> int:
