@@ -15,7 +15,6 @@ router = Router()
 async def get_day(call: CallbackQuery, state: FSMContext) -> None:
     """Handles the "schedule" callback query."""
     user: User = await add_user(user_id=call.from_user.id, username=call.from_user.username)
-
     await call.message.edit_text(
         text="Виберіть день ⬇️",
         reply_markup=await schedule_kb(user.user_group),
@@ -27,7 +26,6 @@ async def get_day(call: CallbackQuery, state: FSMContext) -> None:
 async def get_faculty(call: CallbackQuery, state: FSMContext) -> None:
     """Handles callback queries for changing user data or selecting a day."""
     await state.update_data(day=week_days_first[0] if call.data in {"change_user_data", "poll_start"} else call.data)
-
     faculties = await get_faculties()
     await call.message.edit_text(
         text="Виберіть факультатив ⬇️",
@@ -39,7 +37,6 @@ async def get_faculty(call: CallbackQuery, state: FSMContext) -> None:
 async def get_course(call: CallbackQuery, state: FSMContext) -> None:
     """Handles the selection of a faculty."""
     await state.update_data(faculty=call.data)
-
     await call.message.edit_text(
         text="Виберіть курс ⬇️",
         reply_markup=await course_kb(),
@@ -50,11 +47,10 @@ async def get_course(call: CallbackQuery, state: FSMContext) -> None:
 async def get_group(call: CallbackQuery, state: FSMContext) -> None:
     """Handles the selection of a course."""
     await state.update_data(course=call.data)
-    user_data = await state.get_data()
-
+    groups = await state.get_data()
     await call.message.edit_text(
         text="Виберіть групу ⬇️",
-        reply_markup=await group_kb(user_data),
+        reply_markup=await group_kb(groups),
     )
 
 
