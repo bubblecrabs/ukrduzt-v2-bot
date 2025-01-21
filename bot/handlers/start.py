@@ -10,7 +10,6 @@ router = Router()
 
 async def handle_start(
         user_id: int,
-        edit_message: bool,
         message_obj: Message | CallbackQuery,
         state: FSMContext
 ) -> None:
@@ -30,10 +29,11 @@ async def handle_start(
         except Exception:
             pass
 
-    if edit_message:
-        sent_message = await message_obj.message.edit_text(text=text, reply_markup=keyboard)
-    else:
-        sent_message = await message_obj.answer(text=text, reply_markup=keyboard)
+    sent_message = await message_obj.bot.send_message(
+        chat_id=message_obj.from_user.id,
+        text=text,
+        reply_markup=keyboard
+    )
 
     # Save the ID of the new message
     await state.update_data(last_bot_message_id=sent_message.message_id)
@@ -44,7 +44,6 @@ async def start_command(message: Message, state: FSMContext) -> None:
     """Handles the /start command to welcome the user and provide the current schedule."""
     await handle_start(
         user_id=message.from_user.id,
-        edit_message=False,
         message_obj=message,
         state=state,
     )
@@ -55,7 +54,6 @@ async def start_callback(call: CallbackQuery, state: FSMContext) -> None:
     """Handles the "start" callback query to provide the current schedule."""
     await handle_start(
         user_id=call.from_user.id,
-        edit_message=True,
         message_obj=call,
         state=state,
     )
