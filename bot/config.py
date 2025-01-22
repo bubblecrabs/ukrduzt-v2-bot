@@ -20,6 +20,12 @@ class Config(BaseSettings):
     postgres_user: str = Field(alias="POSTGRES_USER")
     postgres_password: SecretStr = Field(alias="POSTGRES_PASSWORD")
 
+    # Redis settings
+    redis_host: str = Field(alias="REDIS_HOST")
+    redis_port: int = Field(alias="REDIS_PORT")
+    redis_db: int = Field(alias="REDIS_DB")
+    redis_password: SecretStr = Field(alias="REDIS_PASSWORD")
+
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"

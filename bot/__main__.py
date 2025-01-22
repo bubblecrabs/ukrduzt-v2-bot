@@ -1,10 +1,11 @@
 import asyncio
 import logging
+from urllib.parse import quote
 
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
-from aiogram.fsm.storage.memory import MemoryStorage
+from aiogram.fsm.storage.redis import RedisStorage
 
 from bot.config import config
 from bot.handlers import get_routers
@@ -31,7 +32,10 @@ async def main() -> None:
     )
 
     # Set up storage for FSM
-    storage = MemoryStorage()
+    encoded_password = quote(config.redis_password.get_secret_value())
+    storage = RedisStorage.from_url(
+        url=f"redis://:{encoded_password}@{config.redis_host}:{config.redis_port}/{config.redis_db}"
+    )
 
     # Set up Dispatcher
     dp = Dispatcher(storage=storage)

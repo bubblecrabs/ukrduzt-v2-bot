@@ -5,6 +5,7 @@
 [![Pydantic](https://img.shields.io/badge/Pydantic-2.10+-red)](https://docs.pydantic.dev/)
 [![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-2.0+-red)](https://www.sqlalchemy.org/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue)](https://www.postgresql.org/)
+[![Redis](https://img.shields.io/badge/Redis-7.0+-red)](https://redis.io/)
 [![Docker](https://img.shields.io/badge/Docker-Latest-blue)](https://www.docker.com/)
 
 ![Project Screenshot Placeholder](https://i.imgur.com/sFaMPUG.png)
@@ -28,6 +29,8 @@ Ensure you have the following installed on your system:
 
 - Python 3.12
 - Docker
+- PostgreSQL
+- Redis
 - Git
 
 ### Steps
