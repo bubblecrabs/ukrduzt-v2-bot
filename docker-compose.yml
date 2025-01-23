@@ -1,7 +1,6 @@
 services:
   db:
     image: postgres:16-alpine
-    container_name: postgres_db
     hostname: "${POSTGRES_HOST}"
     volumes:
       - postgres_data:/var/lib/postgresql/data
@@ -11,7 +10,6 @@ services:
 
   redis:
     image: redis:7-alpine
-    container_name: redis_cache
     hostname: "${REDIS_HOST}"
     volumes:
       - redis_data:/data
@@ -23,7 +21,6 @@ services:
   bot:
     build:
       dockerfile: Dockerfile
-    container_name: ukrduzt_schedule_bot
     env_file:
       - .env
     depends_on:
