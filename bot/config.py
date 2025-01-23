@@ -27,7 +27,7 @@ class Config(BaseSettings):
     redis_password: SecretStr = Field(alias="REDIS_PASSWORD")
 
     class Config:
-        env_file = ".env"
+        env_file = "../.env"
         env_file_encoding = "utf-8"
 
 # Create settings instance

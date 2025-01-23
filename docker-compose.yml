@@ -8,8 +8,6 @@ services:
     env_file:
       - .env
     restart: unless-stopped
-    ports:
-      - "${POSTGRES_PORT}:5432"
 
   redis:
     image: redis:7-alpine
@@ -17,6 +15,8 @@ services:
     hostname: "${REDIS_HOST}"
     volumes:
       - redis_data:/data
+    env_file:
+      - .env
     command: "redis-server --requirepass ${REDIS_PASSWORD}"
     restart: unless-stopped
 
