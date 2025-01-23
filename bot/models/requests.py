@@ -38,14 +38,6 @@ async def add_user(user_id: int, username: str | None) -> User:
         existing_user = result.scalar_one_or_none()
 
         if existing_user:
-            # If both user_id and username match, return the existing user
-            if existing_user.user_id == user_id and existing_user.username == username:
-                return existing_user
-
-            # Update the user's details if they don't match completely
-            existing_user.user_id = user_id
-            existing_user.username = username
-            await session.commit()
             return existing_user
 
         # Create a new user if no matching user is found

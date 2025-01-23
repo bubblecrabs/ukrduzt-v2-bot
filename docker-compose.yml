@@ -7,6 +7,8 @@ services:
       - postgres_data:/var/lib/postgresql/data
     env_file:
       - .env
+    ports:
+      - "${POSTGRES_PORT}:5432"
     restart: unless-stopped
     networks:
       - shared
