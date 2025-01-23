@@ -1,15 +1,19 @@
 services:
   db:
     image: postgres:16-alpine
+    container_name: postgres-db
     hostname: "${POSTGRES_HOST}"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     env_file:
       - .env
     restart: unless-stopped
+    networks:
+      - shared
 
   redis:
     image: redis:7-alpine
+    container_name: redis-cache
     hostname: "${REDIS_HOST}"
     volumes:
       - redis_data:/data
@@ -17,6 +21,8 @@ services:
       - .env
     command: "redis-server --requirepass ${REDIS_PASSWORD}"
     restart: unless-stopped
+    networks:
+      - shared
 
   bot:
     build:
@@ -27,7 +33,13 @@ services:
       - db
       - redis
     restart: unless-stopped
+    networks:
+      - shared
 
 volumes:
   postgres_data:
   redis_data:
+
+networks:
+  shared:
+    name: global_shared
