@@ -23,7 +23,7 @@ services:
   bot:
     build:
       dockerfile: Dockerfile
-    container_name: ukrduzt_v2_bot
+    container_name: ukrduzt_schedule_bot
     env_file:
       - .env
     depends_on:

@@ -38,8 +38,8 @@ Ensure you have the following installed on your system:
 1. **Clone the Repository**
 
    ```bash
-   git clone https://github.com/bubblecrabs/ukrduzt-v2-bot.git
-   cd ukrduzt-v2-bot
+   git clone https://github.com/bubblecrabs/ukrduzt-schedule-bot.git
+   cd ukrduzt-schedule-bot
    ```
 
 2. **Set Up a Virtual Environment**
@@ -81,8 +81,8 @@ Ensure you have the following installed on your system:
 1. **Clone the Repository**
 
    ```bash
-   git clone https://github.com/bubblecrabs/ukrduzt-v2-bot.git
-   cd ukrduzt-v2-bot
+   git clone https://github.com/bubblecrabs/ukrduzt-schedule-bot.git
+   cd ukrduzt-schedule-bot
    ```
 
 2. **Set Up Environment Variables**
