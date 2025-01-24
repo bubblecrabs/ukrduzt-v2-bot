@@ -7,7 +7,7 @@ from bot.models.user import User
 
 async def get_users() -> Sequence[User]:
     """Fetch all users from the database."""
-    async with (async_session() as session):
+    async with async_session() as session:
         stmt = select(User)
         result = await session.execute(stmt)
         return result.scalars().all()
