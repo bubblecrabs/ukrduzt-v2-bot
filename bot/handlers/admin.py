@@ -29,7 +29,7 @@ async def stats_bot(call: CallbackQuery) -> None:
         f"👤 *Останній зареєстрований:* {latest_user.username or latest_user.user_id}\n"
         f"🕒 *Час реєстрації:* {latest_user.created_at.strftime('%d.%m.%Y %H:%M')}"
         if latest_user
-        else "*Користувачі не знайдені*"
+        else "\n*Користувачі не знайдені*"
     )
 
     await call.message.edit_text(
