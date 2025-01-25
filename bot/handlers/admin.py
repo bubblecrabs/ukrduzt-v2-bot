@@ -1,5 +1,6 @@
 from aiogram import Router, F
 from aiogram.types import CallbackQuery, InlineKeyboardMarkup
+from aiogram.utils.markdown import text
 
 from bot.keyboards.inline import admin_kb, admin_func_kb
 from bot.models.requests import get_users
@@ -26,7 +27,7 @@ async def stats_bot(call: CallbackQuery) -> None:
     latest_user = sorted_users[0] if sorted_users else None
 
     latest_user_info = (
-        f"👤 *Останній зареєстрований:* {latest_user.username or latest_user.user_id}\n"
+        f"👤 *Останній зареєстрований:* {text(latest_user.username or str(latest_user.user_id))}\n"
         f"🕒 *Час реєстрації:* {latest_user.created_at.strftime('%d.%m.%Y %H:%M')}"
         if latest_user
         else "\n*Користувачі не знайдені*"
