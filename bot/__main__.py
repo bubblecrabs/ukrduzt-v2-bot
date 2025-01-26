@@ -9,7 +9,7 @@ from aiogram.fsm.storage.redis import RedisStorage
 
 from bot.config import config
 from bot.handlers import get_routers
-from bot.database import async_init_db
+from bot.database.setup import async_init_db
 
 # Set up logging for the bot
 logging.basicConfig(level=config.logging_level)
