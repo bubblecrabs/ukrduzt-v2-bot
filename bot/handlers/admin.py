@@ -26,9 +26,8 @@ async def stats_bot(call: CallbackQuery) -> None:
     latest_user = sorted_users[0] if sorted_users else None
 
     if latest_user:
-        user_name = latest_user.username if latest_user.username else latest_user.user_id
         latest_user_info = (
-            f"👤 *Останній зареєстрований:* {user_name}\n"
+            f"👤 *Останній зареєстрований:* `{latest_user.username or latest_user.user_id}`\n"
             f"🕒 *Час реєстрації:* {latest_user.created_at.strftime('%d.%m.%Y %H:%M')}"
         )
     else:
