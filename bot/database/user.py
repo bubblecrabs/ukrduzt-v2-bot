@@ -2,7 +2,7 @@ from datetime import datetime
 from sqlalchemy import Integer, BigInteger, String, DateTime, UniqueConstraint, func
 from sqlalchemy.orm import Mapped, mapped_column
 
-from bot.models.base import Base
+from bot.database.base import Base
 
 class User(Base):
     """Represents a user in the system."""

@@ -1,8 +1,8 @@
 from collections.abc import Sequence
 from sqlalchemy import select
 
-from bot.models.db import async_session
-from bot.models.user import User
+from bot.database import async_session
+from bot.database.user import User
 
 
 async def get_users() -> Sequence[User]:

@@ -1,11 +1,12 @@
 from aiogram import Router, F
 from aiogram.types import CallbackQuery, InlineKeyboardMarkup
 
-from bot.keyboards.inline import admin_kb, admin_func_kb
-from bot.models.requests import get_users
+from bot.keyboards.admin.inline import admin_kb, admin_func_kb
+from bot.database.requests import get_users
 from bot.config import config
 
 router = Router()
+
 
 @router.callback_query(F.data == "admin_menu", F.from_user.id == config.admin)
 async def admin_menu(call: CallbackQuery) -> None:
@@ -15,6 +16,7 @@ async def admin_menu(call: CallbackQuery) -> None:
         text="Виберіть, що хочете зробити ⬇️",
         reply_markup=keyboard
     )
+
 
 @router.callback_query(F.data == "stats_bot", F.from_user.id == config.admin)
 async def stats_bot(call: CallbackQuery) -> None:

@@ -2,14 +2,15 @@ from aiogram import Router, F
 from aiogram.types import CallbackQuery
 from aiogram.fsm.context import FSMContext
 
-from bot.keyboards.inline import schedule_kb, faculty_kb, course_kb, group_kb
+from bot.keyboards.custom.inline import schedule_kb, faculty_kb, course_kb, group_kb
 from bot.utils.states import Schedule
 from bot.utils.utils import get_current_week, week_days_first, week_days_h
 from bot.utils.requests import get_faculties, get_schedules
-from bot.models.user import User
-from bot.models.requests import get_user_by_id, add_user, update_user
+from bot.database.user import User
+from bot.database.requests import get_user_by_id, add_user, update_user
 
 router = Router()
+
 
 @router.callback_query(F.data == "schedule")
 async def get_day(call: CallbackQuery, state: FSMContext) -> None:
