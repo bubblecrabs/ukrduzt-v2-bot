@@ -13,7 +13,7 @@ from bot.database.setup import async_init_db
 config = Config()
 
 # Set up logging for the bot
-logging.basicConfig(level=config.logging_level)
+logging.basicConfig(level=config.logging.level)
 logger = logging.getLogger(__name__)
 
 
@@ -28,12 +28,12 @@ async def main() -> None:
 
     # Create Bot instance with token and default properties
     bot = Bot(
-        token=config.token.get_secret_value(),
+        token=config.bot.token.get_secret_value(),
         default=DefaultBotProperties(parse_mode=ParseMode.MARKDOWN)
     )
 
     # Set up storage for FSM
-    storage = RedisStorage.from_url(url=config.get_redis_url())
+    storage = RedisStorage.from_url(url=config.redis.url)
 
     # Set up Dispatcher
     dp = Dispatcher(storage=storage)

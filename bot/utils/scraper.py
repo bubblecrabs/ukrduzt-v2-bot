@@ -9,7 +9,7 @@ from bot.utils.utils import check_week_and_day
 from bot.utils.redis_cache import RedisCache
 
 config = Config()
-redis_cache = RedisCache(redis_url=config.get_redis_url(), ttl=config.redis_ttl)
+redis_cache = RedisCache(redis_url=config.redis.url, ttl=config.redis.ttl)
 
 
 async def get_faculties() -> dict[str, str]:
@@ -52,7 +52,7 @@ async def get_groups(faculty: str, course: str) -> dict[str, str]:
         "Referer": "http://rasp.kart.edu.ua/schedule",
         "X-Requested-With": "XMLHttpRequest",
     }
-    data = f"year_id={config.year_id}&faculty_id={faculty}&course_id={course}"
+    data = f"year_id={config.site.year_id}&faculty_id={faculty}&course_id={course}"
 
     async with aiohttp.ClientSession() as session:
         try:
@@ -74,7 +74,7 @@ async def get_schedules(week: str, day: str, faculty: str, course: str, group: s
         return cached_data
 
     url = (
-        f"http://rasp.kart.edu.ua/schedule/jsearch?year_id={config.year_id}&semester_id={config.semestr}"
+        f"http://rasp.kart.edu.ua/schedule/jsearch?year_id={config.site.year_id}&semester_id={config.site.semestr}"
         f"&faculty_id={faculty}&course_id={course}&team_id={group}"
     )
     headers = {

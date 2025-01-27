@@ -9,7 +9,7 @@ config = Config()
 router = Router()
 
 
-@router.callback_query(F.data == "admin_menu", F.from_user.id == config.admin)
+@router.callback_query(F.data == "admin_menu", F.from_user.id == config.bot.admin)
 async def admin_menu(call: CallbackQuery) -> None:
     """Handler for the admin menu callback query."""
     keyboard: InlineKeyboardMarkup = await admin_kb()
@@ -19,7 +19,7 @@ async def admin_menu(call: CallbackQuery) -> None:
     )
 
 
-@router.callback_query(F.data == "stats_bot", F.from_user.id == config.admin)
+@router.callback_query(F.data == "stats_bot", F.from_user.id == config.bot.admin)
 async def stats_bot(call: CallbackQuery) -> None:
     """Retrieves and displays the total number of users."""
     keyboard: InlineKeyboardMarkup = await admin_func_kb()

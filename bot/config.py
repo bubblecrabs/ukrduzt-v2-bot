@@ -4,37 +4,59 @@ from pydantic_settings import BaseSettings
 from pydantic import Field, SecretStr
 
 
-class Config(BaseSettings):
-    # Bot settings
+class BotSettings(BaseSettings):
     admin: int = Field(alias="ADMIN")
     token: SecretStr = Field(alias="BOT_TOKEN")
 
-    # Site settings
+
+class SiteSettings(BaseSettings):
     year_id: int = Field(alias="YEAR_ID")
     semestr: int = Field(alias="SEMESTR")
 
-    # Logging settings
-    logging_level: int = Field(alias="LOG_LEVEL")
 
-    # PostgreSQL settings
-    postgres_host: str = Field(alias="POSTGRES_HOST")
-    postgres_port: int = Field(alias="POSTGRES_PORT")
-    postgres_db: str = Field(alias="POSTGRES_DB")
-    postgres_user: str = Field(alias="POSTGRES_USER")
-    postgres_password: SecretStr = Field(alias="POSTGRES_PASSWORD")
+class LoggingSettings(BaseSettings):
+    level: int = Field(alias="LOG_LEVEL")
 
-    # Redis settings
-    redis_host: str = Field(alias="REDIS_HOST")
-    redis_port: int = Field(alias="REDIS_PORT")
-    redis_db: int = Field(alias="REDIS_DB")
-    redis_password: SecretStr = Field(alias="REDIS_PASSWORD")
-    redis_ttl: int = Field(alias="REDIS_TTL")
 
-    class Config:
+class PostgresSettings(BaseSettings):
+    host: str = Field(alias="POSTGRES_HOST")
+    port: int = Field(alias="POSTGRES_PORT")
+    db: str = Field(alias="POSTGRES_DB")
+    user: str = Field(alias="POSTGRES_USER")
+    password: SecretStr = Field(alias="POSTGRES_PASSWORD")
+
+    @property
+    def url(self) -> str:
+        """Generate the PostgreSQL connection URL."""
+        encoded_password: str = quote(self.password.get_secret_value())
+        return (
+            f"postgresql+asyncpg://{self.user}:{encoded_password}@"
+            f"{self.host}:{self.port}/{self.db}"
+        )
+
+
+class RedisSettings(BaseSettings):
+    host: str = Field(alias="REDIS_HOST")
+    port: int = Field(alias="REDIS_PORT")
+    db: int = Field(alias="REDIS_DB")
+    password: SecretStr = Field(alias="REDIS_PASSWORD")
+    ttl: int = Field(alias="REDIS_TTL")
+
+    @property
+    def url(self) -> str:
+        """Generate the Redis connection URL."""
+        encoded_password: str = quote(self.password.get_secret_value())
+        return f"redis://:{encoded_password}@{self.host}:{self.port}/{self.db}"
+
+
+class Config:
+    bot: BotSettings = BotSettings()
+    site: SiteSettings = SiteSettings()
+    logging: LoggingSettings = LoggingSettings()
+    postgres: PostgresSettings = PostgresSettings()
+    redis: RedisSettings = RedisSettings()
+
+    class BaseConfig:
+        extra = "allow"
         env_file: str = "../.env"
         env_file_encoding: str = "utf-8"
-
-    def get_redis_url(self) -> str:
-        """Generate the Redis connection URL."""
-        encoded_password: str = quote(self.redis_password.get_secret_value())
-        return f"redis://:{encoded_password}@{self.redis_host}:{self.redis_port}/{self.redis_db}"
