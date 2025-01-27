@@ -1,6 +1,8 @@
 from aiogram.utils.keyboard import InlineKeyboardBuilder, InlineKeyboardMarkup, InlineKeyboardButton
 
-from bot.config import config
+from bot.config import Config
+
+config = Config()
 
 
 async def start_kb(user_id: int) -> InlineKeyboardMarkup:

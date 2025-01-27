@@ -4,6 +4,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 from bot.database.base import Base
 
+
 class User(Base):
     """Represents a user in the system."""
     __tablename__ = "users"

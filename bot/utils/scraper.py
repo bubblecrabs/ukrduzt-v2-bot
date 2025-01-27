@@ -4,12 +4,21 @@ import json
 import aiohttp
 from bs4 import BeautifulSoup
 
-from bot.config import config
+from bot.config import Config
 from bot.utils.utils import check_week_and_day
+from bot.utils.redis_cache import RedisCache
+
+config = Config()
+redis_cache = RedisCache(redis_url=config.get_redis_url())
 
 
 async def get_faculties() -> dict[str, str]:
-    """Fetches a list of faculties from the schedule website."""
+    """Fetches a list of faculties from the schedule website with caching."""
+    cache_key = "faculties"
+    cached_data = await redis_cache.get(cache_key)
+    if cached_data:
+        return cached_data
+
     url = "http://rasp.kart.edu.ua/schedule"
     async with aiohttp.ClientSession() as session:
         try:
@@ -18,16 +27,23 @@ async def get_faculties() -> dict[str, str]:
                 html = await response.text()
                 soup = BeautifulSoup(html, 'html.parser')
                 faculty_list = soup.find(id="schedule-search-faculty").find_all("option")
-                return {
+                result = {
                     faculty.get("value"): faculty.text
                     for faculty in faculty_list if faculty.get("value")
                 }
+                await redis_cache.set(cache_key, result)
+                return result
         except Exception as e:
             raise RuntimeError(f"Failed to fetch faculties: {e}") from e
 
 
 async def get_groups(faculty: str, course: str) -> dict[str, str]:
-    """Fetches a list of groups for a specific faculty and course."""
+    """Fetches a list of groups for a specific faculty and course with caching."""
+    cache_key = f"groups:{faculty}:{course}"
+    cached_data = await redis_cache.get(cache_key)
+    if cached_data:
+        return cached_data
+
     url = "http://rasp.kart.edu.ua/schedule/jdata"
     headers = {
         "Accept": "*/*",
@@ -43,13 +59,20 @@ async def get_groups(faculty: str, course: str) -> dict[str, str]:
             async with session.post(url, headers=headers, data=data) as response:
                 response.raise_for_status()
                 response_json = await response.json()
-                return {team["id"]: team["title"] for team in response_json.get("teams", [])}
+                result = {team["id"]: team["title"] for team in response_json.get("teams", [])}
+                await redis_cache.set(cache_key, result)
+                return result
         except Exception as e:
             raise RuntimeError(f"Failed to fetch groups: {e}") from e
 
 
 async def get_schedules(week: str, day: str, faculty: str, course: str, group: str) -> tuple:
-    """Fetches the schedule for a specific week, day, faculty, course, and group."""
+    """Fetches the schedule for a specific week, day, faculty, course, and group with caching."""
+    cache_key = f"schedules:{week}:{day}:{faculty}:{course}:{group}"
+    cached_data = await redis_cache.get(cache_key)
+    if cached_data:
+        return cached_data
+
     url = (
         f"http://rasp.kart.edu.ua/schedule/jsearch?year_id={config.year_id}&semester_id={config.semestr}"
         f"&faculty_id={faculty}&course_id={course}&team_id={group}"
@@ -69,6 +92,8 @@ async def get_schedules(week: str, day: str, faculty: str, course: str, group: s
                 response.raise_for_status()
                 response_text = await response.text()
                 response_json = json.loads(response_text)
-                return check_week_and_day(week, day, response_json)
+                result = check_week_and_day(week, day, response_json)
+                await redis_cache.set(cache_key, result)
+                return result
         except Exception as e:
             raise RuntimeError(f"Failed to fetch schedules: {e}") from e

@@ -1,5 +1,6 @@
 from aiogram.fsm.state import State, StatesGroup
 
+
 class Schedule(StatesGroup):
     """FSM states for managing the schedule process."""
     day: State = State()

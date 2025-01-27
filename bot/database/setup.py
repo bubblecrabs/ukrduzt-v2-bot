@@ -1,8 +1,9 @@
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine, AsyncEngine, AsyncSession
 from sqlalchemy.engine import URL
-from bot.config import config
+from bot.config import Config
 from bot.database.base import Base
 
+config = Config()
 url_obj = URL.create(
     drivername="postgresql+asyncpg",
     username=config.postgres_user,
@@ -14,6 +15,7 @@ url_obj = URL.create(
 
 async_engine: AsyncEngine = create_async_engine(url_obj, echo=False)
 async_session: async_sessionmaker[AsyncSession] = async_sessionmaker(bind=async_engine)
+
 
 async def async_init_db() -> None:
     """Initialize the database by creating all tables."""

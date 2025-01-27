@@ -1,5 +1,8 @@
+from urllib.parse import quote
+
 from pydantic_settings import BaseSettings
 from pydantic import Field, SecretStr
+
 
 class Config(BaseSettings):
     # Bot settings
@@ -27,8 +30,10 @@ class Config(BaseSettings):
     redis_password: SecretStr = Field(alias="REDIS_PASSWORD")
 
     class Config:
-        env_file = "../.env"
-        env_file_encoding = "utf-8"
+        env_file: str = "../.env"
+        env_file_encoding: str = "utf-8"
 
-# Create settings instance
-config = Config()
+    def get_redis_url(self) -> str:
+        """Generate the Redis connection URL."""
+        encoded_password: str = quote(self.redis_password.get_secret_value())
+        return f"redis://:{encoded_password}@{self.redis_host}:{self.redis_port}/{self.redis_db}"

@@ -3,8 +3,9 @@ from aiogram.types import CallbackQuery, InlineKeyboardMarkup
 
 from bot.keyboards.admin.inline import admin_kb, admin_func_kb
 from bot.database.requests import get_users
-from bot.config import config
+from bot.config import Config
 
+config = Config()
 router = Router()
 
 

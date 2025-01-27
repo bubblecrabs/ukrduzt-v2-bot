@@ -25,7 +25,6 @@ def replace_numbers(text: str) -> str:
     return ' '.join(replaced_words)
 
 
-
 def check_week_and_day(week: str, day: str, res_text: dict) -> tuple[dict[str, str], bool]:
     """Check the schedule for the specified week and day."""
     name_subjects: dict[str, str] = {}
