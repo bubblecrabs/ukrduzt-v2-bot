@@ -57,6 +57,5 @@ class Config:
     redis: RedisSettings = RedisSettings()
 
     class BaseConfig:
-        extra = "allow"
         env_file: str = "../.env"
         env_file_encoding: str = "utf-8"
