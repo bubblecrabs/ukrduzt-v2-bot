@@ -9,7 +9,7 @@ from bot.utils.utils import check_week_and_day
 from bot.utils.redis_cache import RedisCache
 
 config = Config()
-redis_cache = RedisCache(redis_url=config.get_redis_url())
+redis_cache = RedisCache(redis_url=config.get_redis_url(), ttl=config.redis_ttl)
 
 
 async def get_faculties() -> dict[str, str]:

@@ -28,6 +28,7 @@ class Config(BaseSettings):
     redis_port: int = Field(alias="REDIS_PORT")
     redis_db: int = Field(alias="REDIS_DB")
     redis_password: SecretStr = Field(alias="REDIS_PASSWORD")
+    redis_ttl: int = Field(alias="REDIS_TTL")
 
     class Config:
         env_file: str = "../.env"

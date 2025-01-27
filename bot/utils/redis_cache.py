@@ -3,7 +3,7 @@ from redis.asyncio import Redis
 
 
 class RedisCache:
-    def __init__(self, redis_url: str, ttl: int = 3600):
+    def __init__(self, redis_url: str, ttl: int):
         """Initializes the Redis cache."""
         self.redis = Redis.from_url(redis_url, decode_responses=True)
         self.ttl = ttl

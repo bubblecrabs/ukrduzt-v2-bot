@@ -55,13 +55,9 @@ async def get_group(call: CallbackQuery, state: FSMContext) -> None:
     )
 
 
-@router.callback_query(F.data.in_(week_days_h))
-@router.callback_query(F.message.text == "Виберіть групу ⬇️")
-async def get_schedule(call: CallbackQuery, state: FSMContext) -> None:
-    """Handles the selection of a group or day and displays the schedule."""
-    week = get_current_week()
+async def get_user_group_data(state: FSMContext, call: CallbackQuery) -> tuple[str, str, str, str, str, str]:
+    """Retrieves and processes user group data based on the callback query and FSM state."""
     user_data = await state.get_data()
-
     if call.message.text == "Виберіть групу ⬇️":
         group, group_name = call.data.split(",")
         faculty = user_data["faculty"].removeprefix("faculty_")
@@ -83,26 +79,40 @@ async def get_schedule(call: CallbackQuery, state: FSMContext) -> None:
         group_name = user.user_group_name
         selected_day, selected_day_id = call.data.split("|")
 
-    schedule_data = await get_schedules(week, selected_day_id, faculty, course, group)
-    subjects, change_week = schedule_data
-    week_str = "наступний" if change_week else "цей"
+    return faculty, course, group, group_name, selected_day, selected_day_id
 
+
+def format_schedule_text(subjects: dict[int, str], week: str, week_str: str, selected_day: str, group_name: str) -> str:
+    """Formats the schedule text based on the provided data."""
     if subjects:
         subjects_text = "\n".join(f"{sid}: *{sname}*" for sid, sname in subjects.items())
-        text = (
+        return (
             f"🔔 Показано розклад на *{week_str}* тиждень\n\n"
             f"{subjects_text}\n\n"
             f"⏰ Вибраний день - *{selected_day}*\n"
             f"📆 Поточна неділя - *{week}*\n"
             f"💼 Вибрана група - *{group_name}*"
         )
-    else:
-        text = (
+    return (
             f"🔍 На *цей* день ваш розклад вільний\n\n"
             f"⏰ Вибраний день - *{selected_day}*\n"
             f"📆 Поточна неділя - *{week}*\n"
             f"💼 Вибрана група - *{group_name}*"
-        )
+    )
+
+
+@router.callback_query(F.data.in_(week_days_h))
+@router.callback_query(F.message.text == "Виберіть групу ⬇️")
+async def get_schedule(call: CallbackQuery, state: FSMContext) -> None:
+    """Handles the selection of a group or day and displays the schedule."""
+    week = get_current_week()
+    faculty, course, group, group_name, selected_day, selected_day_id = await get_user_group_data(state, call)
+
+    schedule_data = await get_schedules(week, selected_day_id, faculty, course, group)
+    subjects, change_week = schedule_data
+    week_str = "наступний" if change_week else "цей"
+
+    text = format_schedule_text(subjects, week, week_str, selected_day, group_name)
 
     await call.message.edit_text(text=text)
     await state.clear()
