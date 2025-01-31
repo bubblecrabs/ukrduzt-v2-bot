@@ -15,9 +15,9 @@ This is a Telegram bot designed to help students and staff of UkrDUZT access the
 
 ## Features
 
-- 📅 View the university schedule for different groups and faculties.
-- 📲 Intuitive and user-friendly interface.
-- 🛠 Built with modern Python features and tools.
+- 📅 **View the university schedule for different groups and faculties.**
+- 📱 **Intuitive and user-friendly interface.**
+- 🐍 **Built with modern Python features and tools.**
 
 ## Installation and Setup
 
@@ -27,11 +27,11 @@ Follow these steps to set up and run the project:
 
 Ensure you have the following installed on your system:
 
-- Python 3.12
-- Docker
-- PostgreSQL
-- Redis
-- Git
+- **Python 3.12**
+- **Docker**
+- **PostgreSQL**
+- **Redis**
+- **Git**
 
 ### Steps
 

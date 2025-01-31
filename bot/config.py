@@ -50,11 +50,11 @@ class RedisSettings(BaseSettings):
 
 
 class Config:
-    bot: BotSettings = BotSettings()
-    site: SiteSettings = SiteSettings()
-    logging: LoggingSettings = LoggingSettings()
-    postgres: PostgresSettings = PostgresSettings()
-    redis: RedisSettings = RedisSettings()
+    bot = BotSettings()
+    site = SiteSettings()
+    logging = LoggingSettings()
+    postgres = PostgresSettings()
+    redis = RedisSettings()
 
     class BaseConfig:
         env_file: str = "../.env"

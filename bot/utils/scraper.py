@@ -45,18 +45,11 @@ async def get_groups(faculty: str, course: str) -> dict[str, str]:
         return cached_data
 
     url = "http://rasp.kart.edu.ua/schedule/jdata"
-    headers = {
-        "Accept": "*/*",
-        "Content-Type": "application/x-www-form-urlencoded",
-        "Origin": "http://rasp.kart.edu.ua",
-        "Referer": "http://rasp.kart.edu.ua/schedule",
-        "X-Requested-With": "XMLHttpRequest",
-    }
     data = f"year_id={config.site.year_id}&faculty_id={faculty}&course_id={course}"
 
     async with aiohttp.ClientSession() as session:
         try:
-            async with session.post(url, headers=headers, data=data) as response:
+            async with session.post(url, data=data) as response:
                 response.raise_for_status()
                 response_json = await response.json()
                 result = {team["id"]: team["title"] for team in response_json.get("teams", [])}
@@ -78,10 +71,6 @@ async def get_schedules(week: str, day: str, faculty: str, course: str, group: s
         f"&faculty_id={faculty}&course_id={course}&team_id={group}"
     )
     headers = {
-        "Accept": "*/*",
-        "Content-Type": "application/x-www-form-urlencoded",
-        "Origin": "http://rasp.kart.edu.ua",
-        "Referer": "http://rasp.kart.edu.ua/schedule",
         "X-Requested-With": "XMLHttpRequest",
     }
     data = f"_search=false&nd={round(time.time())}&rows=20&page=1&sidx=&sord=asc"
