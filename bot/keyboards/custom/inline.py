@@ -1,7 +1,7 @@
 from aiogram.utils.keyboard import InlineKeyboardBuilder, InlineKeyboardMarkup, InlineKeyboardButton
 
 from bot.utils.utils import week_days_first, week_days_h
-from bot.utils.scraper import get_groups
+from bot.utils.scraper import fetch_groups
 
 
 async def schedule_kb(user_group: str | None) -> InlineKeyboardMarkup:
@@ -53,7 +53,7 @@ async def group_kb(user_data: dict[str, str]) -> InlineKeyboardMarkup:
     kb = InlineKeyboardBuilder()
     faculty = user_data["faculty"].split("_")[1]
     course = user_data["course"].split("_")[1]
-    groups = await get_groups(faculty, course)
+    groups = await fetch_groups(faculty, course)
     buttons = [
         InlineKeyboardButton(text=group_name, callback_data=f"{group_id},{group_name}")
         for group_id, group_name in groups.items()

@@ -1,5 +1,4 @@
 import asyncio
-import logging
 
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
@@ -9,22 +8,16 @@ from aiogram.fsm.storage.redis import RedisStorage
 from bot.config import Config
 from bot.handlers import get_routers
 from bot.database.setup import async_init_db
+from bot.middlewares.logging import logger
 
 config = Config()
-
-# Set up logging for the bot
-logging.basicConfig(level=config.logging.level)
-logger = logging.getLogger(__name__)
 
 
 async def main() -> None:
     """Initialize the database, set up the bot, and start polling."""
-    try:
-        # Initialize the database asynchronously
-        await async_init_db()
-    except Exception as ex:
-        logger.error(f"Database initialization failed: {ex}")
-        return
+
+    # Initialize the database
+    await async_init_db()
 
     # Create Bot instance with token and default properties
     bot = Bot(

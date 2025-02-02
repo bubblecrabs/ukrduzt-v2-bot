@@ -11,6 +11,12 @@ def get_current_week() -> str:
     return "Парна" if week_number % 2 != 0 else "Непарна"
 
 
+def is_weekend() -> bool:
+    """Checks whether today is a Saturday or Sunday."""
+    today = datetime.today().weekday()
+    return today >= 5
+
+
 def replace_numbers(text: str) -> str:
     """Replace numbers in the text with corresponding emoji numbers."""
     replacements = {
@@ -25,13 +31,13 @@ def replace_numbers(text: str) -> str:
     return ' '.join(replaced_words)
 
 
-def check_week_and_day(week: str, day: str, res_text: dict) -> tuple[dict[str, str], bool]:
+def parse_subjects(week: str, day: str, json_data: dict) -> dict[str, str]:
     """Check the schedule for the specified week and day."""
-    name_subjects: dict[str, str] = {}
-    day_name = datetime.now().strftime('%A')  # Get current day in full format (e.g., "Monday")
-    change = day_name in ("Saturday", "Sunday")
+    result: dict[str, str] = {}
+    change = is_weekend()
+    sid = 1
 
-    for name_id, subject in enumerate(res_text.get("rows", []), start=1):
+    for subject in json_data.get("rows", []):
         row = subject["cell"]
         cur_week_pair = row[1]
         new_week_pair = "парн." if change and cur_week_pair == "непарн." else "непарн." if change else cur_week_pair
@@ -39,6 +45,7 @@ def check_week_and_day(week: str, day: str, res_text: dict) -> tuple[dict[str, s
         if (week == "Парна" and new_week_pair != "непарн.") or (week == "Непарна" and new_week_pair == "непарн."):
             name_subject = row[int(day)]
             if name_subject:
-                name_subjects[replace_numbers(str(name_id))] = name_subject
+                result[replace_numbers(str(sid))] = name_subject
+            sid += 1
 
-    return name_subjects, change
+    return result

@@ -5,14 +5,14 @@ import aiohttp
 from bs4 import BeautifulSoup
 
 from bot.config import Config
-from bot.utils.utils import check_week_and_day
+from bot.utils.utils import parse_subjects
 from bot.utils.redis_cache import RedisCache
 
 config = Config()
 redis_cache = RedisCache(redis_url=config.redis.url, ttl=config.redis.ttl)
 
 
-async def get_faculties() -> dict[str, str]:
+async def fetch_faculties() -> dict[str, str]:
     """Fetches a list of faculties from the schedule website with caching."""
     cache_key = "faculties"
     cached_data = await redis_cache.get(cache_key)
@@ -37,7 +37,7 @@ async def get_faculties() -> dict[str, str]:
             raise RuntimeError(f"Failed to fetch faculties: {e}") from e
 
 
-async def get_groups(faculty: str, course: str) -> dict[str, str]:
+async def fetch_groups(faculty: str, course: str) -> dict[str, str]:
     """Fetches a list of groups for a specific faculty and course with caching."""
     cache_key = f"groups:{faculty}:{course}"
     cached_data = await redis_cache.get(cache_key)
@@ -64,7 +64,7 @@ async def get_groups(faculty: str, course: str) -> dict[str, str]:
             raise RuntimeError(f"Failed to fetch groups: {e}") from e
 
 
-async def get_schedules(week: str, day: str, faculty: str, course: str, group: str) -> tuple:
+async def fetch_schedules(week: str, day: str, faculty: str, course: str, group: str) -> dict:
     """Fetches the schedule for a specific week, day, faculty, course, and group with caching."""
     cache_key = f"schedules:{week}:{day}:{faculty}:{course}:{group}"
     cached_data = await redis_cache.get(cache_key)
@@ -89,7 +89,7 @@ async def get_schedules(week: str, day: str, faculty: str, course: str, group: s
                 response.raise_for_status()
                 response_text = await response.text()
                 response_json = json.loads(response_text)
-                result = check_week_and_day(week, day, response_json)
+                result = parse_subjects(week, day, response_json)
                 await redis_cache.set(cache_key, result)
                 return result
         except Exception as e:
