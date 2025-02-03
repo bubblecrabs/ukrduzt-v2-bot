@@ -82,9 +82,10 @@ async def get_user_group_data(state: FSMContext, call: CallbackQuery) -> tuple[s
     return faculty, course, group, group_name, selected_day, selected_day_id
 
 
-def format_schedule_text(subjects: dict[int, str], week: str, week_str: str, selected_day: str, group_name: str) -> str:
+def format_schedule_text(subjects: dict[int, str], week: str, selected_day: str, group_name: str) -> str:
     """Formats the schedule text based on the provided data."""
     if subjects:
+        week_str = "наступний" if is_weekend() else "цей"
         subjects_text = "\n".join(f"{sid}: *{sname}*" for sid, sname in subjects.items())
         return (
             f"🔔 Показано розклад на *{week_str}* тиждень\n\n"
@@ -109,8 +110,7 @@ async def get_schedule(call: CallbackQuery, state: FSMContext) -> None:
     faculty, course, group, group_name, selected_day, selected_day_id = await get_user_group_data(state, call)
 
     subjects = await fetch_schedules(week, selected_day_id, faculty, course, group)
-    week_str = "наступний" if is_weekend() else "цей"
-    text = format_schedule_text(subjects, week, week_str, selected_day, group_name)
+    text = format_schedule_text(subjects, week, selected_day, group_name)
 
     await call.message.edit_text(text=text)
     await state.clear()
