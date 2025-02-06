@@ -8,13 +8,18 @@ from aiogram.fsm.storage.redis import RedisStorage
 from bot.config import Config
 from bot.handlers import get_routers
 from bot.database.setup import async_init_db
-from bot.middlewares.logging import logger
+from bot.middlewares.logging import logging
 
 config = Config()
 
 
 async def main() -> None:
     """Initialize the database, set up the bot, and start polling."""
+    logging.basicConfig(
+        level=config.logging.level,
+        format="%(asctime)s - %(levelname)s - %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S"
+    )
 
     # Initialize the database
     await async_init_db()
@@ -39,9 +44,4 @@ async def main() -> None:
 
 
 if __name__ == "__main__":
-    try:
-        asyncio.run(main())
-    except (KeyboardInterrupt, SystemExit):
-        logger.info("Bot stopped manually")
-    except Exception as e:
-        logger.error(f"Unexpected error: {e}")
+    asyncio.run(main())

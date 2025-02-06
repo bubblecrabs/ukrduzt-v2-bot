@@ -2,7 +2,7 @@ from collections.abc import Sequence
 from sqlalchemy import select
 
 from bot.database import async_session
-from bot.database.user import User
+from bot.database.models import User
 
 
 async def get_users() -> Sequence[User]:
@@ -40,13 +40,7 @@ async def add_user(user_id: int, username: str | None) -> User:
         return new_user
 
 
-async def update_user(
-    user_id: int,
-    faculty: int,
-    course: int,
-    group: int,
-    group_name: str,
-) -> None:
+async def update_user(user_id: int, faculty: int, course: int, group: int, group_name: str) -> None:
     """Update user information if the user exists."""
     async with async_session() as session:
         stmt = select(User).where(User.user_id == user_id)

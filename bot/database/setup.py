@@ -2,7 +2,6 @@ from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine, Asyn
 
 from bot.config import Config
 from bot.database.base import Base
-from bot.middlewares.logging import logger
 
 config = Config()
 
@@ -12,8 +11,5 @@ async_session: async_sessionmaker[AsyncSession] = async_sessionmaker(bind=async_
 
 async def async_init_db() -> None:
     """Initialize the database by creating all tables."""
-    try:
-        async with async_engine.begin() as conn:
-            await conn.run_sync(Base.metadata.create_all)
-    except Exception as ex:
-        logger.error(f"Database initialization failed: {ex}")
+    async with async_engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)

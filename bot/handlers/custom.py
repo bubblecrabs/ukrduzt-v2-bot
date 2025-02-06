@@ -6,7 +6,7 @@ from bot.keyboards.custom.inline import schedule_kb, faculty_kb, course_kb, grou
 from bot.utils.states import Schedule
 from bot.utils.utils import get_current_week, week_days_first, week_days_h, is_weekend
 from bot.utils.scraper import fetch_faculties, fetch_schedules
-from bot.database.user import User
+from bot.database.models import User
 from bot.database.requests import get_user_by_id, add_user, update_user
 
 router = Router()

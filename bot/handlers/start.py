@@ -19,11 +19,7 @@ def generate_start_text() -> str:
 
 
 async def send_or_update_message(
-        user_id: int,
-        text: str,
-        keyboard: InlineKeyboardMarkup,
-        state: FSMContext,
-        bot: Bot
+        user_id: int, text: str, keyboard: InlineKeyboardMarkup, state: FSMContext, bot: Bot
 ) -> None:
     """Sends a new message or updates the last bot message."""
     previous_message_id = (await state.get_data()).get("last_bot_message_id")

@@ -2,10 +2,6 @@ import logging
 import functools
 from typing import Any, Callable
 
-from bot.config import Config
-
-config = Config()
-logging.basicConfig(level=config.logging.level, format='%(message)s')
 logger = logging.getLogger(__name__)
 
 

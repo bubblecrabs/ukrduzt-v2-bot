@@ -51,8 +51,8 @@ async def course_kb() -> InlineKeyboardMarkup:
 async def group_kb(user_data: dict[str, str]) -> InlineKeyboardMarkup:
     """Generates a keyboard for selecting a group based on the user's faculty and course."""
     kb = InlineKeyboardBuilder()
-    faculty = user_data["faculty"].split("_")[1]
-    course = user_data["course"].split("_")[1]
+    faculty = user_data["faculty"].removeprefix("faculty_")
+    course = user_data["course"].removeprefix("course_")
     groups = await fetch_groups(faculty, course)
     buttons = [
         InlineKeyboardButton(text=group_name, callback_data=f"{group_id},{group_name}")
