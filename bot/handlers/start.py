@@ -25,10 +25,7 @@ async def send_or_update_message(
     previous_message_id = (await state.get_data()).get("last_bot_message_id")
 
     if previous_message_id:
-        try:
-            await bot.delete_message(chat_id=user_id, message_id=previous_message_id)
-        except Exception:
-            pass
+        await bot.delete_message(chat_id=user_id, message_id=previous_message_id)
 
     sent_message = await bot.send_message(chat_id=user_id, text=text, reply_markup=keyboard)
     await state.update_data(last_bot_message_id=sent_message.message_id)
@@ -37,12 +34,10 @@ async def send_or_update_message(
 @router.message(Command("start"))
 async def start_command(message: Message, state: FSMContext) -> None:
     """Handles the /start command."""
-    text = generate_start_text()
-    keyboard = await start_kb(message.from_user.id)
     await send_or_update_message(
         user_id=message.from_user.id,
-        text=text,
-        keyboard=keyboard,
+        text=generate_start_text(),
+        keyboard=await start_kb(message.from_user.id),
         state=state,
         bot=message.bot
     )
@@ -51,12 +46,10 @@ async def start_command(message: Message, state: FSMContext) -> None:
 @router.callback_query(F.data == "start")
 async def start_callback(call: CallbackQuery, state: FSMContext) -> None:
     """Handles the start callback query."""
-    text = generate_start_text()
-    keyboard = await start_kb(call.from_user.id)
     await send_or_update_message(
         user_id=call.from_user.id,
-        text=text,
-        keyboard=keyboard,
+        text=generate_start_text(),
+        keyboard=await start_kb(call.from_user.id),
         state=state,
         bot=call.bot
     )
