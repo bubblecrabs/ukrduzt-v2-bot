@@ -6,7 +6,6 @@ from bot.keyboards.custom.inline import schedule_kb, faculty_kb, course_kb, grou
 from bot.utils.states import Schedule
 from bot.utils.utils import get_current_week, week_days_first, week_days_h, is_weekend
 from bot.utils.scraper import fetch_faculties, fetch_schedules
-from bot.database.models import User
 from bot.database.requests import get_user_by_id, add_user, update_user
 
 router = Router()
@@ -15,7 +14,7 @@ router = Router()
 @router.callback_query(F.data == "schedule")
 async def get_day(call: CallbackQuery, state: FSMContext) -> None:
     """Handles the "schedule" callback query."""
-    user: User = await add_user(user_id=call.from_user.id, username=call.from_user.username)
+    user = await add_user(user_id=call.from_user.id, username=call.from_user.username)
     await call.message.edit_text(
         text="Виберіть день ⬇️",
         reply_markup=await schedule_kb(user.user_group),
