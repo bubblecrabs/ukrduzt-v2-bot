@@ -1,6 +1,6 @@
 from sqlalchemy import select, func, desc
 
-from bot.database import async_session
+from bot.database.session import async_session
 from bot.database.models.user import User
 
 

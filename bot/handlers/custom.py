@@ -3,9 +3,9 @@ from aiogram.types import CallbackQuery
 from aiogram.fsm.context import FSMContext
 
 from bot.keyboards.custom.inline import schedule_kb, faculty_kb, course_kb, group_kb
-from bot.utils.states import Schedule
-from bot.utils.utils import get_current_week, week_days_first, week_days_h, is_weekend
-from bot.utils.scraper import fetch_faculties, fetch_schedules
+from bot.fsm.states import Schedule
+from bot.services.utils import get_current_week, week_days_first, week_days_h, is_weekend
+from bot.services.scraper import fetch_faculties, fetch_schedules
 from bot.database.requests import get_user_by_id, add_user, update_user
 
 router = Router()

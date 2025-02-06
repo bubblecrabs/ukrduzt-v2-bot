@@ -4,9 +4,10 @@ import json
 import aiohttp
 from bs4 import BeautifulSoup
 
-from bot.config import Config
-from bot.utils.utils import parse_subjects
-from bot.utils.redis_cache import RedisCache
+from bot.core.config import Config
+from bot.core.redis import RedisCache
+from bot.services.utils import parse_subjects
+
 
 config = Config()
 redis_cache = RedisCache(redis_url=config.redis.url, ttl=config.redis.ttl)

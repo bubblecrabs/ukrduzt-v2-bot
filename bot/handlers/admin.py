@@ -3,7 +3,7 @@ from aiogram.types import CallbackQuery
 
 from bot.keyboards.admin.inline import admin_kb, admin_func_kb
 from bot.database.requests import get_users_count, get_latest_user
-from bot.config import Config
+from bot.core.config import Config
 
 config = Config()
 router = Router()

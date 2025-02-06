@@ -3,8 +3,9 @@ from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 
+from bot.database.session import config
 from bot.keyboards.start.inline import start_kb
-from bot.utils.utils import get_current_week
+from bot.services.utils import get_current_week
 
 router = Router()
 
@@ -34,10 +35,11 @@ async def send_or_update_message(
 @router.message(Command("start"))
 async def start_command(message: Message, state: FSMContext) -> None:
     """Handles the /start command."""
+    admin = True if message.from_user.id == config.bot.admin else False
     await send_or_update_message(
         user_id=message.from_user.id,
         text=generate_start_text(),
-        keyboard=await start_kb(message.from_user.id),
+        keyboard=await start_kb(admin=admin),
         state=state,
         bot=message.bot
     )
@@ -46,10 +48,11 @@ async def start_command(message: Message, state: FSMContext) -> None:
 @router.callback_query(F.data == "start")
 async def start_callback(call: CallbackQuery, state: FSMContext) -> None:
     """Handles the start callback query."""
+    admin = True if call.from_user.id == config.bot.admin else False
     await send_or_update_message(
         user_id=call.from_user.id,
         text=generate_start_text(),
-        keyboard=await start_kb(call.from_user.id),
+        keyboard=await start_kb(admin=admin),
         state=state,
         bot=call.bot
     )
