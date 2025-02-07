@@ -1,15 +1,14 @@
 from aiogram import Router, F
 from aiogram.types import CallbackQuery
 
-from bot.keyboards.admin.inline import admin_kb, admin_func_kb
-from bot.database.requests import get_users_count, get_latest_user
-from bot.core.config import Config
+from bot.filters.admin import AdminFilter
+from bot.keyboards.inline.admin import admin_kb, admin_func_kb
+from bot.database.database import get_users_count, get_latest_user
 
-config = Config()
 router = Router()
 
 
-@router.callback_query(F.data == "admin_menu", F.from_user.id == config.bot.admin)
+@router.callback_query(F.data == "admin_menu", AdminFilter())
 async def admin_menu(call: CallbackQuery) -> None:
     """Handler for the admin menu callback query."""
     await call.message.edit_text(
@@ -17,7 +16,7 @@ async def admin_menu(call: CallbackQuery) -> None:
         reply_markup=await admin_kb()
     )
 
-@router.callback_query(F.data == "stats_bot", F.from_user.id == config.bot.admin)
+@router.callback_query(F.data == "stats_bot", AdminFilter())
 async def stats_bot(call: CallbackQuery) -> None:
     """Retrieves and displays the total number of users."""
     count = await get_users_count()

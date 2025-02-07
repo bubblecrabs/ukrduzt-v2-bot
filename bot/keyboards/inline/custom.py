@@ -4,7 +4,7 @@ from bot.services.utils import week_days_first, week_days_h
 from bot.services.scraper import fetch_groups
 
 
-async def schedule_kb(user_group: str | None) -> InlineKeyboardMarkup:
+async def schedule_kb(user_group: int | None) -> InlineKeyboardMarkup:
     """Generates the schedule keyboard based on the user's group."""
     kb = InlineKeyboardBuilder()
     buttons = [

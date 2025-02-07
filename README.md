@@ -4,6 +4,7 @@
 [![Aiohttp](https://img.shields.io/badge/Aiohttp-3.11+-blue)](https://docs.aiohttp.org/)
 [![Pydantic](https://img.shields.io/badge/Pydantic-2.10+-red)](https://docs.pydantic.dev/)
 [![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-2.0+-red)](https://www.sqlalchemy.org/)
+[![Alembic](https://img.shields.io/badge/Alembic-1.11+-yellow)](https://alembic.sqlalchemy.org/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue)](https://www.postgresql.org/)
 [![Redis](https://img.shields.io/badge/Redis-7.0+-red)](https://redis.io/)
 [![Docker](https://img.shields.io/badge/Docker-Latest-blue)](https://www.docker.com/)
@@ -11,7 +12,6 @@
 ![Project Screenshot Placeholder](https://i.imgur.com/sFaMPUG.png)
 
 This is a Telegram bot designed to help students and staff of UkrDUZT access their university schedule easily. The bot provides quick and intuitive access to schedules directly within Telegram.
-
 
 ## Features
 
@@ -46,7 +46,7 @@ Ensure you have the following installed on your system:
 
    ```bash
    python -m venv venv
-   source venv/bin/activate
+   source venv/bin/activate  # On Windows use: venv\Scripts\activate
    ```
 
 3. **Install Dependencies**
@@ -59,17 +59,24 @@ Ensure you have the following installed on your system:
 
    Rename the `.env.example` file to `.env` and replace the placeholder values with your own data:
    
-      ```bash
+   ```bash
    mv .env.example .env
    ```   
-   
+
    Example `.env` file:
    ```env
    BOT_TOKEN=1234567890:abcdefghijklmnopqrstuvwxyz
    ADMIN=1234567890
+   DATABASE_URL=postgresql://user:password@localhost:5432/db_name
    ```
 
-5. **Run the Bot Locally**
+5. **Initialize the Database**
+
+   ```bash
+   alembic upgrade head
+   ```
+
+6. **Run the Bot Locally**
 
    ```bash
    cd bot
@@ -97,6 +104,7 @@ Ensure you have the following installed on your system:
    ```env
    BOT_TOKEN=1234567890:abcdefghijklmnopqrstuvwxyz
    ADMIN=1234567890
+   DATABASE_URL=postgresql://user:password@postgres:5432/db_name
    ```
 
 3. **Run the Container**
@@ -104,6 +112,12 @@ Ensure you have the following installed on your system:
    ```bash
    docker compose up -d --build
    docker ps
+   ```
+
+4. **Run Database Migrations**
+
+   ```bash
+   docker compose exec bot alembic upgrade head
    ```
 
 ## Contributing

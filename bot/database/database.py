@@ -1,7 +1,11 @@
-from sqlalchemy import select, func, desc
+from sqlalchemy import select, func, desc, insert
+from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
-from bot.database.session import async_session
 from bot.database.models.user import User
+from bot.core.config import settings
+
+async_engine = create_async_engine(settings.postgres.url, echo=False)
+async_session = async_sessionmaker(bind=async_engine)
 
 
 async def get_user_by_id(user_id: int) -> User | None:
@@ -28,26 +32,24 @@ async def get_latest_user() -> User | None:
         return result.scalar_one_or_none()
 
 
-async def add_user(user_id: int, username: str | None) -> User:
-    """Add a new user to the database or update if conflicts exist, and return the user."""
+async def get_user_is_admin(user_id: int) -> bool:
+    """Check if the user is an admin."""
     async with async_session() as session:
-        # Check if a user with the given user_id exists
-        stmt = select(User).where((User.user_id == user_id))
+        stmt = select(User.is_admin).filter_by(user_id=user_id)
         result = await session.execute(stmt)
-        existing_user = result.scalar_one_or_none()
+        return result.scalar_one_or_none()
 
-        if existing_user:
-            return existing_user
 
-        # Create a new user if no matching user is found
-        new_user = User(user_id=user_id, username=username)
-        session.add(new_user)
+async def add_user(user_id: int, username: str | None) -> User:
+    """Add a new user to the database and return the user."""
+    async with async_session() as session:
+        stmt = insert(User).values(user_id=user_id, username=username)
+        result = await session.execute(stmt)
         await session.commit()
-        await session.refresh(new_user)
-        return new_user
+        return result.scalar_one_or_none()
 
 
-async def update_user(user_id: int, faculty: int, course: int, group: int, group_name: str) -> None:
+async def update_user(user_id: int, faculty: int, course: int, group: int, group_name: str) -> User:
     """Update user information if the user exists."""
     async with async_session() as session:
         stmt = select(User).where(User.user_id == user_id)
@@ -60,3 +62,4 @@ async def update_user(user_id: int, faculty: int, course: int, group: int, group
             user.user_group = group
             user.user_group_name = group_name
             await session.commit()
+        return user

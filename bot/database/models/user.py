@@ -17,6 +17,7 @@ class User(Base):
     user_group: Mapped[int | None] = mapped_column(Integer, nullable=True)
     user_group_name: Mapped[str | None] = mapped_column(String(50), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())
+    is_admin: Mapped[bool] = mapped_column(default=False, index=True)
 
     __table_args__ = (
         UniqueConstraint("user_id", name="unique_user_id"),

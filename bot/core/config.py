@@ -1,24 +1,22 @@
 from urllib.parse import quote
 
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import Field, SecretStr
 
 
-class BotSettings(BaseSettings):
-    admin: int = Field(alias="ADMIN")
+class EnvBaseSettings(BaseSettings):
+    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
+
+
+class BotSettings(EnvBaseSettings):
     token: SecretStr = Field(alias="BOT_TOKEN")
 
 
-class SiteSettings(BaseSettings):
-    year_id: int = Field(alias="YEAR_ID")
-    semestr: int = Field(alias="SEMESTR")
-
-
-class LoggingSettings(BaseSettings):
+class LoggingSettings(EnvBaseSettings):
     level: int = Field(alias="LOG_LEVEL")
 
 
-class PostgresSettings(BaseSettings):
+class PostgresSettings(EnvBaseSettings):
     host: str = Field(alias="POSTGRES_HOST")
     port: int = Field(alias="POSTGRES_PORT")
     db: str = Field(alias="POSTGRES_DB")
@@ -35,7 +33,7 @@ class PostgresSettings(BaseSettings):
         )
 
 
-class RedisSettings(BaseSettings):
+class RedisSettings(EnvBaseSettings):
     host: str = Field(alias="REDIS_HOST")
     port: int = Field(alias="REDIS_PORT")
     db: int = Field(alias="REDIS_DB")
@@ -49,13 +47,18 @@ class RedisSettings(BaseSettings):
         return f"redis://:{encoded_password}@{self.host}:{self.port}/{self.db}"
 
 
-class Config:
-    bot = BotSettings()
-    site = SiteSettings()
-    logging = LoggingSettings()
-    postgres = PostgresSettings()
-    redis = RedisSettings()
+class SiteSettings(EnvBaseSettings):
+    year_id: int = Field(alias="YEAR_ID")
+    semestr: int = Field(alias="SEMESTR")
 
-    class BaseConfig:
-        env_file: str = "../../.env"
-        env_file_encoding: str = "utf-8"
+
+class Settings:
+    def __init__(self):
+        self.bot = BotSettings()
+        self.logging = LoggingSettings()
+        self.postgres = PostgresSettings()
+        self.redis = RedisSettings()
+        self.site = SiteSettings()
+
+
+settings = Settings()

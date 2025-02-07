@@ -4,13 +4,9 @@ import json
 import aiohttp
 from bs4 import BeautifulSoup
 
-from bot.core.config import Config
-from bot.core.redis import RedisCache
+from bot.core.config import settings
+from bot.core.loader import redis_cache
 from bot.services.utils import parse_subjects
-
-
-config = Config()
-redis_cache = RedisCache(redis_url=config.redis.url, ttl=config.redis.ttl)
 
 
 async def fetch_faculties() -> dict[str, str]:
@@ -52,7 +48,7 @@ async def fetch_groups(faculty: str, course: str) -> dict[str, str]:
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36",
         "X-Requested-With": "XMLHttpRequest",
     }
-    data = f"year_id={config.site.year_id}&faculty_id={faculty}&course_id={course}"
+    data = f"year_id={settings.site.year_id}&faculty_id={faculty}&course_id={course}"
     async with aiohttp.ClientSession() as session:
         try:
             async with session.post(url, headers=headers, data=data) as response:
@@ -73,7 +69,7 @@ async def fetch_schedules(week: str, day: str, faculty: str, course: str, group:
         return cached_data
 
     url = (
-        f"http://rasp.kart.edu.ua/schedule/jsearch?year_id={config.site.year_id}&semester_id={config.site.semestr}"
+        f"http://rasp.kart.edu.ua/schedule/jsearch?year_id={settings.site.year_id}&semester_id={settings.site.semestr}"
         f"&faculty_id={faculty}&course_id={course}&team_id={group}"
     )
     headers = {

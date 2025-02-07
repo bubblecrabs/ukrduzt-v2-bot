@@ -2,11 +2,11 @@ from aiogram import Router, F
 from aiogram.types import CallbackQuery
 from aiogram.fsm.context import FSMContext
 
-from bot.keyboards.custom.inline import schedule_kb, faculty_kb, course_kb, group_kb
-from bot.fsm.states import Schedule
+from bot.keyboards.inline.custom import schedule_kb, faculty_kb, course_kb, group_kb
+from bot.states.schedule import ScheduleState
 from bot.services.utils import get_current_week, week_days_first, week_days_h, is_weekend
 from bot.services.scraper import fetch_faculties, fetch_schedules
-from bot.database.requests import get_user_by_id, add_user, update_user
+from bot.database.database import get_user_by_id, add_user, update_user
 
 router = Router()
 
@@ -14,12 +14,15 @@ router = Router()
 @router.callback_query(F.data == "schedule")
 async def get_day(call: CallbackQuery, state: FSMContext) -> None:
     """Handles the "schedule" callback query."""
-    user = await add_user(user_id=call.from_user.id, username=call.from_user.username)
+    user = await get_user_by_id(user_id=call.from_user.id)
+    if not user:
+        user = await add_user(user_id=call.from_user.id, username=call.from_user.username)
+
     await call.message.edit_text(
         text="Виберіть день ⬇️",
         reply_markup=await schedule_kb(user.user_group),
     )
-    await state.set_state(Schedule.day)
+    await state.set_state(ScheduleState.day)
 
 
 @router.callback_query(F.data.in_({"change_user_data", "poll_start"}) | F.data.in_(week_days_first))
