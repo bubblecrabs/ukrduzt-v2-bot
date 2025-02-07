@@ -66,8 +66,6 @@ Ensure you have the following installed on your system:
    Example `.env` file:
    ```env
    BOT_TOKEN=1234567890:abcdefghijklmnopqrstuvwxyz
-   ADMIN=1234567890
-   DATABASE_URL=postgresql://user:password@localhost:5432/db_name
    ```
 
 5. **Initialize the Database**
@@ -103,8 +101,6 @@ Ensure you have the following installed on your system:
    Example `.env` file:
    ```env
    BOT_TOKEN=1234567890:abcdefghijklmnopqrstuvwxyz
-   ADMIN=1234567890
-   DATABASE_URL=postgresql://user:password@postgres:5432/db_name
    ```
 
 3. **Run the Container**

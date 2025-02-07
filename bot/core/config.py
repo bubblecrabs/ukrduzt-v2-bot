@@ -1,5 +1,3 @@
-from urllib.parse import quote
-
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import Field, SecretStr
 
@@ -26,9 +24,8 @@ class PostgresSettings(EnvBaseSettings):
     @property
     def url(self) -> str:
         """Generate the PostgreSQL connection URL."""
-        encoded_password: str = quote(self.password.get_secret_value())
         return (
-            f"postgresql+asyncpg://{self.user}:{encoded_password}@"
+            f"postgresql+asyncpg://{self.user}:{self.password.get_secret_value()}@"
             f"{self.host}:{self.port}/{self.db}"
         )
 
@@ -43,8 +40,7 @@ class RedisSettings(EnvBaseSettings):
     @property
     def url(self) -> str:
         """Generate the Redis connection URL."""
-        encoded_password: str = quote(self.password.get_secret_value())
-        return f"redis://:{encoded_password}@{self.host}:{self.port}/{self.db}"
+        return f"redis://:{self.password.get_secret_value()}@{self.host}:{self.port}/{self.db}"
 
 
 class SiteSettings(EnvBaseSettings):
