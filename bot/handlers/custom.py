@@ -67,7 +67,7 @@ async def get_group(call: CallbackQuery, state: FSMContext) -> None:
     )
 
 
-async def get_user_group_data(state: FSMContext, call: CallbackQuery) -> tuple[str, str, str, str, str, str]:
+async def get_user_group_data(call: CallbackQuery, state: FSMContext) -> tuple[str, str, str, str, str, str]:
     """Retrieves and processes user group data based on the callback query and FSM state."""
     if call.message.text == "Виберіть групу ⬇️":
         user_data = await state.get_data()
@@ -120,7 +120,7 @@ def format_schedule_text(subjects: dict[int, str], week: str, selected_day: str,
 async def get_schedule(call: CallbackQuery, state: FSMContext) -> None:
     """Handles the selection of a group or day and displays the schedule."""
     week = get_current_week()
-    faculty, course, group, group_name, selected_day, selected_day_id = await get_user_group_data(state, call)
+    faculty, course, group, group_name, selected_day, selected_day_id = await get_user_group_data(call, state)
 
     subjects = await fetch_schedules(week, selected_day_id, faculty, course, group)
     text = format_schedule_text(subjects, week, selected_day, group_name)
