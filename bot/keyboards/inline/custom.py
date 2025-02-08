@@ -1,22 +1,17 @@
 from aiogram.utils.keyboard import InlineKeyboardBuilder, InlineKeyboardMarkup, InlineKeyboardButton
 
-from bot.services.utils import week_days_first, week_days_h
+from bot.services.utils import week_days
 from bot.services.scraper import fetch_groups
 
 
 async def schedule_kb(user_group: int | None) -> InlineKeyboardMarkup:
     """Generates the schedule keyboard based on the user's group."""
     kb = InlineKeyboardBuilder()
-    buttons = [
-        InlineKeyboardButton(
-            text=week_day.split("_" if user_group is None else "|")[0],
-            callback_data=week_day
-        )
-        for week_day in (week_days_first if user_group is None else week_days_h)
-    ]
     if user_group is not None:
         kb.add(InlineKeyboardButton(text="📝 Змінити групу", callback_data="change_user_data"))
-    kb.add(*buttons)
+    for day in week_days:
+        callback_data = f"{day['name']}_{day['id']}" if user_group is None else f"{day['name']}|{day['id']}"
+        kb.add(InlineKeyboardButton(text=day["name"], callback_data=callback_data))
     kb.add(InlineKeyboardButton(text="⬅️ Назад", callback_data="start"))
     kb.adjust(1)
     return kb.as_markup()
@@ -25,11 +20,8 @@ async def schedule_kb(user_group: int | None) -> InlineKeyboardMarkup:
 async def faculty_kb(faculties: dict[str, str]) -> InlineKeyboardMarkup:
     """Generates a keyboard for selecting faculties."""
     kb = InlineKeyboardBuilder()
-    buttons = [
-        InlineKeyboardButton(text=faculty, callback_data=f'faculty_{faculty_id}')
-        for faculty_id, faculty in faculties.items()
-    ]
-    kb.add(*buttons)
+    for faculty_id, faculty in faculties.items():
+        kb.add(InlineKeyboardButton(text=faculty, callback_data=f"faculty_{faculty_id}"))
     kb.add(InlineKeyboardButton(text="⬅️ Назад", callback_data="schedule"))
     kb.adjust(1)
     return kb.as_markup()
@@ -38,27 +30,19 @@ async def faculty_kb(faculties: dict[str, str]) -> InlineKeyboardMarkup:
 async def course_kb() -> InlineKeyboardMarkup:
     """Generates a keyboard for selecting a course."""
     kb = InlineKeyboardBuilder()
-    buttons = [
-        InlineKeyboardButton(text=f'{i}-й курс', callback_data=f'course_{i}')
-        for i in range(1, 7)  # Assuming courses are from 1 to 6
-    ]
-    kb.add(*buttons)
+    for i in range(1, 7):
+        kb.add(InlineKeyboardButton(text=f"{i}-й курс", callback_data=f"course_{i}"))
     kb.add(InlineKeyboardButton(text="⬅️ Назад", callback_data="poll_start"))
     kb.adjust(1)
     return kb.as_markup()
 
 
-async def group_kb(user_data: dict[str, str]) -> InlineKeyboardMarkup:
+async def group_kb(faculty: str, course: str) -> InlineKeyboardMarkup:
     """Generates a keyboard for selecting a group based on the user's faculty and course."""
-    kb = InlineKeyboardBuilder()
-    faculty = user_data["faculty"].removeprefix("faculty_")
-    course = user_data["course"].removeprefix("course_")
     groups = await fetch_groups(faculty, course)
-    buttons = [
-        InlineKeyboardButton(text=group_name, callback_data=f"{group_id},{group_name}")
-        for group_id, group_name in groups.items()
-    ]
-    kb.add(*buttons)
+    kb = InlineKeyboardBuilder()
+    for group_id, group_name in groups.items():
+        kb.add(InlineKeyboardButton(text=group_name, callback_data=f"{group_id},{group_name}"))
     kb.add(InlineKeyboardButton(text="⬅️ Назад", callback_data="poll_start"))
     kb.adjust(1)
     return kb.as_markup()

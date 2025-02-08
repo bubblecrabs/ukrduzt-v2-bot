@@ -1,7 +1,12 @@
 from datetime import date, datetime
 
-week_days_h: list[str] = ["Понеділок|2", "Вівторок|3", "Середа|4", "Четвер|5", "П'ятниця|6"]
-week_days_first: list[str] = ["Понеділок_2", "Вівторок_3", "Середа_4", "Четвер_5", "П'ятниця_6"]
+week_days = [
+    {"name": "Понеділок", "id": "2"},
+    {"name": "Вівторок", "id": "3"},
+    {"name": "Середа", "id": "4"},
+    {"name": "Четвер", "id": "5"},
+    {"name": "П'ятниця", "id": "6"},
+]
 
 
 def get_current_week() -> str:
@@ -25,10 +30,10 @@ def replace_numbers(text: str) -> str:
     }
     words = text.split()
     replaced_words = [
-        replacements.get(word, ''.join(replacements.get(c, c) for c in word))
+        replacements.get(word, "".join(replacements.get(c, c) for c in word))
         for word in words
     ]
-    return ' '.join(replaced_words)
+    return " ".join(replaced_words)
 
 
 def parse_subjects(week: str, day: str, json_data: dict) -> dict[str, str]:

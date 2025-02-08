@@ -7,7 +7,11 @@ from aiogram.types import TelegramObject, Message, CallbackQuery
 
 from bot.core.config import settings
 
-logging.basicConfig(level=settings.logging.level)
+logging.basicConfig(
+    level=settings.logging.level,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S"
+)
 logger = logging.getLogger(__name__)
 
 

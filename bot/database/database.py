@@ -1,4 +1,5 @@
-from sqlalchemy import select, func, desc, insert
+from sqlalchemy import select, func, desc
+from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 from bot.database.models.user import User
@@ -40,16 +41,15 @@ async def get_user_is_admin(user_id: int) -> bool:
         return result.scalar_one_or_none()
 
 
-async def add_user(user_id: int, username: str | None) -> User:
+async def add_user(user_id: int, username: str | None) -> None:
     """Add a new user to the database and return the user."""
     async with async_session() as session:
-        stmt = insert(User).values(user_id=user_id, username=username)
-        result = await session.execute(stmt)
+        stmt = insert(User).values(user_id=user_id, username=username).on_conflict_do_nothing()
+        await session.execute(stmt)
         await session.commit()
-        return result.scalar_one_or_none()
 
 
-async def update_user(user_id: int, faculty: int, course: int, group: int, group_name: str) -> User:
+async def update_user(user_id: int, faculty: int, course: int, group: int, group_name: str) -> None:
     """Update user information if the user exists."""
     async with async_session() as session:
         stmt = select(User).where(User.user_id == user_id)
@@ -62,4 +62,3 @@ async def update_user(user_id: int, faculty: int, course: int, group: int, group
             user.user_group = group
             user.user_group_name = group_name
             await session.commit()
-        return user

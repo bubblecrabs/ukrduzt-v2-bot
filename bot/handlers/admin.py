@@ -16,6 +16,7 @@ async def admin_menu(call: CallbackQuery) -> None:
         reply_markup=await admin_kb()
     )
 
+
 @router.callback_query(F.data == "stats_bot", AdminFilter())
 async def stats_bot(call: CallbackQuery) -> None:
     """Retrieves and displays the total number of users."""

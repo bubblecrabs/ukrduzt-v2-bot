@@ -4,9 +4,9 @@ from aiogram.fsm.context import FSMContext
 
 from bot.keyboards.inline.custom import schedule_kb, faculty_kb, course_kb, group_kb
 from bot.states.schedule import ScheduleState
-from bot.services.utils import get_current_week, week_days_first, week_days_h, is_weekend
+from bot.services.utils import get_current_week, week_days, is_weekend
 from bot.services.scraper import fetch_faculties, fetch_schedules
-from bot.database.database import get_user_by_id, add_user, update_user
+from bot.database.database import get_user_by_id, update_user
 
 router = Router()
 
@@ -15,20 +15,26 @@ router = Router()
 async def get_day(call: CallbackQuery, state: FSMContext) -> None:
     """Handles the "schedule" callback query."""
     user = await get_user_by_id(user_id=call.from_user.id)
-    if not user:
-        user = await add_user(user_id=call.from_user.id, username=call.from_user.username)
-
     await call.message.edit_text(
         text="Виберіть день ⬇️",
-        reply_markup=await schedule_kb(user.user_group),
+        reply_markup=await schedule_kb(user.user_group if user else None),
     )
     await state.set_state(ScheduleState.day)
 
 
-@router.callback_query(F.data.in_({"change_user_data", "poll_start"}) | F.data.in_(week_days_first))
+
+@router.callback_query(F.data.in_([f"{day['name']}_{day['id']}" for day in week_days]))
+@router.callback_query(F.data.in_({"change_user_data", "poll_start"}))
 async def get_faculty(call: CallbackQuery, state: FSMContext) -> None:
     """Handles callback queries for changing user data or selecting a day."""
-    await state.update_data(day=week_days_first[0] if call.data in {"change_user_data", "poll_start"} else call.data)
+    if call.data not in {"change_user_data", "poll_start"}:
+        day_name, day_id = call.data.split("_")
+        selected_day = next((day for day in week_days if day["id"] == day_id), week_days[0])
+    else:
+        selected_day = week_days[0]
+
+    await state.update_data(day=f"{selected_day['name']}_{selected_day['id']}")
+
     faculties = await fetch_faculties()
     await call.message.edit_text(
         text="Виберіть факультатив ⬇️",
@@ -50,17 +56,22 @@ async def get_course(call: CallbackQuery, state: FSMContext) -> None:
 async def get_group(call: CallbackQuery, state: FSMContext) -> None:
     """Handles the selection of a course."""
     await state.update_data(course=call.data)
-    groups = await state.get_data()
+
+    data = await state.get_data()
+    faculty = data["faculty"].removeprefix("faculty_")
+    course = data["course"].removeprefix("course_")
+
     await call.message.edit_text(
         text="Виберіть групу ⬇️",
-        reply_markup=await group_kb(groups),
+        reply_markup=await group_kb(faculty, course),
     )
 
 
 async def get_user_group_data(state: FSMContext, call: CallbackQuery) -> tuple[str, str, str, str, str, str]:
     """Retrieves and processes user group data based on the callback query and FSM state."""
-    user_data = await state.get_data()
     if call.message.text == "Виберіть групу ⬇️":
+        user_data = await state.get_data()
+
         group, group_name = call.data.split(",")
         faculty = user_data["faculty"].removeprefix("faculty_")
         course = user_data["course"].removeprefix("course_")
@@ -104,7 +115,7 @@ def format_schedule_text(subjects: dict[int, str], week: str, selected_day: str,
     )
 
 
-@router.callback_query(F.data.in_(week_days_h))
+@router.callback_query(F.data.in_([f"{day['name']}|{day['id']}" for day in week_days]))
 @router.callback_query(F.message.text == "Виберіть групу ⬇️")
 async def get_schedule(call: CallbackQuery, state: FSMContext) -> None:
     """Handles the selection of a group or day and displays the schedule."""

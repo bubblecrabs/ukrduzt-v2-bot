@@ -24,10 +24,8 @@ class PostgresSettings(EnvBaseSettings):
     @property
     def url(self) -> str:
         """Generate the PostgreSQL connection URL."""
-        return (
-            f"postgresql+asyncpg://{self.user}:{self.password.get_secret_value()}@"
-            f"{self.host}:{self.port}/{self.db}"
-        )
+        return f"postgresql+asyncpg://{self.user}:{self.password.get_secret_value()}@{self.host}:{self.port}/{self.db}"
+
 
 
 class RedisSettings(EnvBaseSettings):
