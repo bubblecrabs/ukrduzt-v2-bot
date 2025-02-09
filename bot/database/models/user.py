@@ -1,4 +1,5 @@
 from datetime import datetime
+
 from sqlalchemy import Integer, BigInteger, String, DateTime, UniqueConstraint, func
 from sqlalchemy.orm import Mapped, mapped_column
 

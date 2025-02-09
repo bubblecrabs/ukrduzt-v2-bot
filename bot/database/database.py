@@ -1,15 +1,25 @@
+from collections.abc import Sequence
+
 from sqlalchemy import select, func, desc
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
-from bot.database.models.user import User
 from bot.core.config import settings
+from bot.database.models.user import User
 
 async_engine = create_async_engine(settings.postgres.url, echo=False)
 async_session = async_sessionmaker(bind=async_engine)
 
 
-async def get_user_by_id(user_id: int) -> User | None:
+async def get_users() -> Sequence[User]:
+    """Fetch all users from the database."""
+    async with async_session() as session:
+        stmt = select(User)
+        result = await session.execute(stmt)
+        return result.scalars().all()
+
+
+async def get_user_by_id(user_id: int) -> User:
     """Fetch a single user by their unique user_id."""
     async with async_session() as session:
         stmt = select(User).where(User.user_id == user_id)
@@ -25,7 +35,7 @@ async def get_users_count() -> int:
         return result.scalar_one_or_none()
 
 
-async def get_latest_user() -> User | None:
+async def get_latest_user() -> User:
     """Get the most recently created user based on ID."""
     async with async_session() as session:
         stmt = select(User).order_by(desc(User.id)).limit(1)

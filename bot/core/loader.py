@@ -4,7 +4,7 @@ from aiogram.enums import ParseMode
 from aiogram.fsm.storage.redis import RedisStorage
 
 from bot.core.config import settings
-from bot.cache.redis import RedisCache
+from bot.services.redis.cache import RedisCache
 
 
 bot = Bot(

@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 
 from bot.core.config import settings
 from bot.core.loader import redis_cache
-from bot.services.utils import parse_subjects
+from bot.services.utils.custom import parse_subjects
 
 
 async def fetch_faculties() -> dict[str, str]:
