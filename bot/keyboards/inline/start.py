@@ -6,6 +6,6 @@ async def start_kb(is_admin: bool) -> InlineKeyboardMarkup:
     kb = InlineKeyboardBuilder()
     kb.add(InlineKeyboardButton(text="📆 Розклад занять", callback_data="schedule"))
     if is_admin:
-        kb.add(InlineKeyboardButton(text="⚡️ Панель розробника", callback_data="start_admin"))
+        kb.add(InlineKeyboardButton(text="⚡️ Панель розробника", callback_data="panel"))
     kb.adjust(1)
     return kb.as_markup()

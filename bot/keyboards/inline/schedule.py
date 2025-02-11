@@ -1,7 +1,7 @@
 from aiogram.utils.keyboard import InlineKeyboardBuilder, InlineKeyboardButton, InlineKeyboardMarkup
 
 from bot.services.scraper.scraper import fetch_groups
-from bot.utils import week_days
+from bot.utils.schedule import week_days
 
 
 async def schedule_kb(user_group: int | None) -> InlineKeyboardMarkup:

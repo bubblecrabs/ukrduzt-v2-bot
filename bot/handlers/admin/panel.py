@@ -8,7 +8,7 @@ from bot.keyboards.inline.admin import admin_kb
 router = Router()
 
 
-@router.callback_query(F.data == "start_admin", AdminFilter())
+@router.callback_query(F.data == "panel", AdminFilter())
 async def start_admin(call: CallbackQuery, state: FSMContext) -> None:
     """Handles for the admin menu callback query."""
     await state.clear()
