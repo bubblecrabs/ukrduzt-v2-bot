@@ -32,6 +32,8 @@ async def fetch_faculties() -> dict[str, str]:
                 return result
         except Exception as e:
             raise RuntimeError(f"Failed to fetch faculties: {e}") from e
+        finally:
+            await redis_cache.close()
 
 
 async def fetch_groups(faculty: str, course: str) -> dict[str, str]:
@@ -59,6 +61,8 @@ async def fetch_groups(faculty: str, course: str) -> dict[str, str]:
                 return result
         except Exception as e:
             raise RuntimeError(f"Failed to fetch groups: {e}") from e
+        finally:
+            await redis_cache.close()
 
 
 async def fetch_schedules(week: str, day: str, faculty: str, course: str, group: str) -> dict:
@@ -91,3 +95,5 @@ async def fetch_schedules(week: str, day: str, faculty: str, course: str, group:
                 return result
         except Exception as e:
             raise RuntimeError(f"Failed to fetch schedules: {e}") from e
+        finally:
+            await redis_cache.close()

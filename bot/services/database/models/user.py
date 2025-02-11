@@ -3,7 +3,7 @@ from datetime import datetime
 from sqlalchemy import Integer, BigInteger, String, DateTime, UniqueConstraint, func
 from sqlalchemy.orm import Mapped, mapped_column
 
-from bot.database.models.base import Base
+from bot.services.database.models.base import Base
 
 
 class User(Base):

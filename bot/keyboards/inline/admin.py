@@ -15,7 +15,7 @@ async def admin_kb() -> InlineKeyboardMarkup:
 async def admin_func_kb() -> InlineKeyboardMarkup:
     """Generates an administrator function menu keyboard."""
     kb = InlineKeyboardBuilder()
-    kb.add(InlineKeyboardButton(text="⬅️ Назад", callback_data="admin_menu"))
+    kb.add(InlineKeyboardButton(text="⬅️ Назад", callback_data="start_admin"))
     kb.adjust(1)
     return kb.as_markup()
 
@@ -24,6 +24,6 @@ async def confirm_mailing_kb() -> InlineKeyboardMarkup:
     """Generates a confirmation keyboard for mailing."""
     kb = InlineKeyboardBuilder()
     kb.add(InlineKeyboardButton(text="📨 Розпочати", callback_data="confirmed_mailing"))
-    kb.add(InlineKeyboardButton(text="🗑 Скасувати", callback_data="admin_menu"))
+    kb.add(InlineKeyboardButton(text="🗑 Скасувати", callback_data="start_admin"))
     kb.adjust(2)
     return kb.as_markup()

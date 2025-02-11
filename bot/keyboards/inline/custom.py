@@ -1,6 +1,6 @@
 from aiogram.utils.keyboard import InlineKeyboardBuilder, InlineKeyboardButton, InlineKeyboardMarkup
 
-from bot.services.scraper import fetch_groups
+from bot.services.scraper.scraper import fetch_groups
 from bot.services.utils.custom import week_days
 
 

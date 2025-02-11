@@ -1,10 +1,11 @@
 from aiogram import F, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from bot.database.database import get_user_by_id
+from bot.services.database.users import get_user_by_id
 from bot.keyboards.inline.custom import course_kb, faculty_kb, group_kb, schedule_kb
-from bot.services.scraper import fetch_faculties, fetch_schedules
+from bot.services.scraper.scraper import fetch_faculties, fetch_schedules
 from bot.services.utils.custom import format_schedule_text, get_user_group_data, week_days
 from bot.services.utils.start import get_current_week
 from bot.states.schedule import ScheduleState
@@ -13,9 +14,9 @@ router = Router()
 
 
 @router.callback_query(F.data == "schedule")
-async def get_day(call: CallbackQuery, state: FSMContext) -> None:
+async def get_day(call: CallbackQuery, state: FSMContext, session: AsyncSession) -> None:
     """Handles the schedule callback query."""
-    user = await get_user_by_id(user_id=call.from_user.id)
+    user = await get_user_by_id(session=session, user_id=call.from_user.id)
     await call.message.edit_text(
         text="Виберіть день ⬇️",
         reply_markup=await schedule_kb(user.user_group),
@@ -69,10 +70,14 @@ async def get_group(call: CallbackQuery, state: FSMContext) -> None:
 
 @router.callback_query(F.data.in_([f"{day['name']}|{day['id']}" for day in week_days]))
 @router.callback_query(F.message.text == "Виберіть групу ⬇️")
-async def get_schedule(call: CallbackQuery, state: FSMContext) -> None:
+async def get_schedule(call: CallbackQuery, state: FSMContext, session: AsyncSession) -> None:
     """Handles the selection of a group or day and displays the schedule."""
     week = get_current_week()
-    faculty, course, group, group_name, selected_day, selected_day_id = await get_user_group_data(call, state)
+    faculty, course, group, group_name, selected_day, selected_day_id = await get_user_group_data(
+        session=session,
+        call=call,
+        state=state
+    )
 
     subjects = await fetch_schedules(week, selected_day_id, faculty, course, group)
     text = format_schedule_text(subjects, week, selected_day, group_name)

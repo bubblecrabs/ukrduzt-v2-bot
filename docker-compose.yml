@@ -17,8 +17,21 @@ services:
       - redis_data:/data
     env_file:
       - .env
-    command: "redis-server --requirepass ${REDIS_PASSWORD}"
+    command: ["redis-server", "--requirepass", "${REDIS_PASSWORD}"]
     restart: unless-stopped
+
+  #nats:
+  #  image: nats:2.10-alpine
+  #  hostname: "${NATS_HOST}"
+  #  env_file:
+  #    - .env
+  #  volumes:
+  #    - nats_data:/data
+  #    - ./bot/services/nats/nats.conf:/etc/nats/nats.conf
+  #  ports:
+  #    - "${NATS_PORT}:4222"
+  #  command: ["-c", "/etc/nats/nats.conf"]
+  #  restart: unless-stopped
 
   bot:
     build:
@@ -28,8 +41,10 @@ services:
     depends_on:
       - db
       - redis
+  #    - nats
     restart: unless-stopped
 
 volumes:
   postgres_data:
   redis_data:
+  #nats_data:

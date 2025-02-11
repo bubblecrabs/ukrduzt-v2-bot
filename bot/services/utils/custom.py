@@ -2,8 +2,9 @@ from datetime import datetime
 
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from bot.database.database import update_user, get_user_by_id
+from bot.services.database.users import update_user, get_user_by_id
 
 week_days = [
     {"name": "Понеділок", "id": "2"},
@@ -20,7 +21,11 @@ def is_weekend() -> bool:
     return today >= 5
 
 
-async def get_user_group_data(call: CallbackQuery, state: FSMContext) -> tuple[str, str, str, str, str, str]:
+async def get_user_group_data(
+        call: CallbackQuery,
+        state: FSMContext,
+        session: AsyncSession
+) -> tuple[str, str, str, str, str, str]:
     """Retrieves and processes user group data based on the callback query and FSM state."""
     if call.message.text == "Виберіть групу ⬇️":
         user_data = await state.get_data()
@@ -31,6 +36,7 @@ async def get_user_group_data(call: CallbackQuery, state: FSMContext) -> tuple[s
         selected_day, selected_day_id = user_data["day"].split("_")
 
         await update_user(
+            session=session,
             faculty=int(faculty),
             course=int(course),
             group=int(group),
@@ -38,7 +44,7 @@ async def get_user_group_data(call: CallbackQuery, state: FSMContext) -> tuple[s
             user_id=call.from_user.id,
         )
     else:
-        user = await get_user_by_id(call.from_user.id)
+        user = await get_user_by_id(session=session, user_id=call.from_user.id)
         faculty = user.user_faculty
         course = user.user_course
         group = user.user_group
