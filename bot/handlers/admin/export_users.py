@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from bot.filters.admin import AdminFilter
 from bot.services.database.users import get_users
-from bot.services.utils.admin import get_username_bot
+from bot.utils.admin import get_username_bot
 
 router = Router()
 

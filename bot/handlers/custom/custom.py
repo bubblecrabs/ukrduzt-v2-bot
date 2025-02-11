@@ -6,8 +6,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from bot.services.database.users import get_user_by_id
 from bot.keyboards.inline.custom import course_kb, faculty_kb, group_kb, schedule_kb
 from bot.services.scraper.scraper import fetch_faculties, fetch_schedules
-from bot.services.utils.custom import format_schedule_text, get_user_group_data, week_days
-from bot.services.utils.start import get_current_week
+from bot.utils.custom import format_schedule_text, get_user_group_data, week_days
+from bot.utils.start import get_current_week
 from bot.states.schedule import ScheduleState
 
 router = Router()

@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from bot.services.database.users import add_user, get_user_is_admin
 from bot.keyboards.inline.start import start_kb
-from bot.services.utils.start import generate_start_text
+from bot.utils.start import generate_start_text
 
 router = Router()
 
