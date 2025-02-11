@@ -8,7 +8,7 @@ from .start import start
 def get_routers() -> list[Router]:
     """Return a list of all routers used in the bot."""
     admin_routers = [
-        start_admin.router,
+        panel.router,
         stats.router,
         export_users.router,
         mailing.router,
