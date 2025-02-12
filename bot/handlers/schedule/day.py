@@ -4,7 +4,7 @@ from aiogram.types import CallbackQuery
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from bot.keyboards.inline.schedule import schedule_kb
-from bot.services.database.users import get_user_by_id
+from bot.services.database.requests.users import get_user_by_id
 from bot.states.schedule import ScheduleState
 
 router = Router()

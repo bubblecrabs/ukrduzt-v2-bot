@@ -7,7 +7,7 @@ from bot.services.database.models.base import Base
 
 
 class User(Base):
-    """Represents a user in the system."""
+    """Represents a user in the database."""
     __tablename__ = "users"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)

@@ -7,8 +7,9 @@ from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from bot.core.config import settings
-from bot.services.database.models import Base
-
+from bot.services.database.models.base import Base
+from bot.services.database.models.user import User # noqa: F401
+from bot.services.database.models.site import WebsiteSettings # noqa: F401
 
 config = context.config
 config.set_main_option("sqlalchemy.url", settings.postgres.url)

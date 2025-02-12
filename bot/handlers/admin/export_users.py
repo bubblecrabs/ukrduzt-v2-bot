@@ -7,7 +7,7 @@ from aiogram.types import CallbackQuery, FSInputFile
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from bot.filters.admin import AdminFilter
-from bot.services.database.users import get_users
+from bot.services.database.requests.users import get_users
 from bot.utils.admin import get_username_bot
 
 router = Router()

@@ -2,7 +2,7 @@ from aiogram.filters import BaseFilter
 from aiogram.types import Message, CallbackQuery
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from bot.services.database.users import get_user_is_admin
+from bot.services.database.requests.users import get_user_is_admin
 
 
 class AdminFilter(BaseFilter):

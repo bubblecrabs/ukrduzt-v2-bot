@@ -1,6 +1,5 @@
 from aiogram.utils.keyboard import InlineKeyboardBuilder, InlineKeyboardButton, InlineKeyboardMarkup
 
-from bot.services.scraper.scraper import fetch_groups
 from bot.utils.schedule import week_days
 
 
@@ -37,9 +36,8 @@ async def course_kb() -> InlineKeyboardMarkup:
     return kb.as_markup()
 
 
-async def group_kb(faculty: str, course: str) -> InlineKeyboardMarkup:
+async def group_kb(groups: dict[str, str]) -> InlineKeyboardMarkup:
     """Generates a keyboard for selecting a group based on the user's faculty and course."""
-    groups = await fetch_groups(faculty, course)
     kb = InlineKeyboardBuilder()
     for group_id, group_name in groups.items():
         kb.add(InlineKeyboardButton(text=group_name, callback_data=f"{group_id},{group_name}"))

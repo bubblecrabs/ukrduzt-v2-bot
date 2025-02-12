@@ -2,7 +2,7 @@ from aiogram import F, Router
 from aiogram.types import CallbackQuery
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from bot.services.database.users import get_latest_user, get_users_count
+from bot.services.database.requests.users import get_latest_user, get_users_count
 from bot.filters.admin import AdminFilter
 from bot.keyboards.inline.admin import admin_func_kb
 

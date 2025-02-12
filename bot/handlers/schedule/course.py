@@ -9,7 +9,7 @@ router = Router()
 
 @router.callback_query(F.data.startswith("faculty_"))
 async def get_course(call: CallbackQuery, state: FSMContext) -> None:
-    """Handles the selection of a faculty."""
+    """Handles the selection of a course."""
     await state.update_data(faculty=call.data)
     await call.message.edit_text(
         text="Виберіть курс ⬇️",

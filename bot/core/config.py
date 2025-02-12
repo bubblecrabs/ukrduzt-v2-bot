@@ -3,8 +3,6 @@ from pydantic import Field, SecretStr
 
 from bot.services.database.config.config import PostgresSettings
 from bot.services.redis.config.config import RedisSettings
-from bot.services.nats.config.config import NatsSettings
-from bot.services.scraper.config.config import SiteSettings
 
 
 class EnvBaseSettings(BaseSettings):
@@ -19,14 +17,11 @@ class LoggingSettings(EnvBaseSettings):
     level: int = Field(alias="LOG_LEVEL")
 
 
-class Settings:
-    def __init__(self):
-        self.bot = BotSettings()
-        self.logging = LoggingSettings()
-        self.postgres = PostgresSettings()
-        self.redis = RedisSettings()
-        self.nats = NatsSettings()
-        self.site = SiteSettings()
+class Settings(EnvBaseSettings):
+    bot: BotSettings = Field(default_factory=BotSettings)
+    logging: LoggingSettings = Field(default_factory=LoggingSettings)
+    postgres: PostgresSettings = Field(default_factory=PostgresSettings)
+    redis: RedisSettings = Field(default_factory=RedisSettings)
 
 
 settings = Settings()

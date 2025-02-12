@@ -9,6 +9,7 @@ class EnvBaseSettings(BaseSettings):
 class RedisSettings(EnvBaseSettings):
     host: str = Field(alias="REDIS_HOST")
     port: int = Field(alias="REDIS_PORT")
+    user: str = Field(alias="REDIS_USER")
     password: SecretStr = Field(alias="REDIS_PASSWORD")
     db: int = Field(alias="REDIS_DB")
     ttl: int = Field(alias="REDIS_TTL")
@@ -16,4 +17,4 @@ class RedisSettings(EnvBaseSettings):
     @property
     def url(self) -> str:
         """Generate the Redis connection URL."""
-        return f"redis://:{self.password.get_secret_value()}@{self.host}:{self.port}/{self.db}"
+        return f"redis://{self.user}:{self.password.get_secret_value()}@{self.host}:{self.port}/{self.db}"

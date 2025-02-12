@@ -9,8 +9,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from bot.filters.admin import AdminFilter
 from bot.filters.datetime import DatetimeFilter
 from bot.keyboards.inline.admin import admin_func_kb, confirm_mailing_kb
-from bot.services.database.users import get_users_count
-from bot.states.mailing import MailingState
+from bot.services.database.requests.users import get_users_count
+from bot.states.admin import MailingState
 
 router = Router()
 

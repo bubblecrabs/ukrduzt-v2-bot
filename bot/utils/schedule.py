@@ -4,7 +4,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from bot.services.database.users import update_user, get_user_by_id
+from bot.services.database.requests.users import update_user, get_user_by_id
 
 week_days = [
     {"name": "Понеділок", "id": "2"},

@@ -1,6 +1,6 @@
 from collections.abc import Sequence
 
-from sqlalchemy import select, func, desc
+from sqlalchemy import select, func, desc, update
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -8,14 +8,14 @@ from bot.services.database.models.user import User
 
 
 async def get_users(session: AsyncSession) -> Sequence[User]:
-    """Fetch all users from the database."""
+    """Get all users from the database."""
     stmt = select(User)
     result = await session.execute(stmt)
     return result.scalars().all()
 
 
 async def get_user_by_id(session: AsyncSession, user_id: int) -> User:
-    """Fetch a single user by their unique user_id."""
+    """Get a single user by their unique user_id."""
     stmt = select(User).where(User.user_id == user_id)
     result = await session.execute(stmt)
     return result.scalar_one_or_none()
@@ -43,7 +43,7 @@ async def get_user_is_admin(session: AsyncSession, user_id: int) -> bool:
 
 
 async def add_user(session: AsyncSession, user_id: int, username: str | None) -> None:
-    """Add a new user to the database and return the user."""
+    """Add a new user to the database."""
     stmt = insert(User).values(user_id=user_id, username=username).on_conflict_do_nothing()
     await session.execute(stmt)
     await session.commit()
@@ -58,13 +58,19 @@ async def update_user(
         group_name: str
 ) -> None:
     """Update user information if the user exists."""
-    stmt = select(User).where(User.user_id == user_id)
-    result = await session.execute(stmt)
-    user = result.scalar_one_or_none()
+    stmt = update(User).where(User.user_id == user_id).values(
+        user_faculty=faculty,
+        user_course=course,
+        user_group = group,
+        user_group_name=group_name
+    )
+    await session.execute(stmt)
+    await session.commit()
 
-    if user:
-        user.user_faculty = faculty
-        user.user_course = course
-        user.user_group = group
-        user.user_group_name = group_name
-        await session.commit()
+
+async def update_admin(session: AsyncSession, user_id: int, set_admin: bool) -> bool:
+    """Updates the admin status for the user with the specified user_id."""
+    stmt = update(User).where(User.user_id == user_id).values(is_admin=set_admin).returning(User.user_id)
+    result = await session.execute(stmt)
+    await session.commit()
+    return result.scalar_one_or_none() is not None
