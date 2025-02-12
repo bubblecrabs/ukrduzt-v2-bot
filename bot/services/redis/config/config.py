@@ -9,7 +9,7 @@ class EnvBaseSettings(BaseSettings):
 class RedisSettings(EnvBaseSettings):
     host: str = Field(alias="REDIS_HOST")
     port: int = Field(alias="REDIS_PORT")
-    user: str = Field(alias="REDIS_USER")
+    user: str | None = Field(alias="REDIS_USER")
     password: SecretStr = Field(alias="REDIS_PASSWORD")
     db: int = Field(alias="REDIS_DB")
     ttl: int = Field(alias="REDIS_TTL")
