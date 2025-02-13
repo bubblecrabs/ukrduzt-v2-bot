@@ -29,7 +29,7 @@ async def export_users(call: CallbackQuery, session: AsyncSession) -> None:
         "User ID", "Username", "Faculty", "Course", "Group", "Group Name", "Is Admin", "Created At"
     ])
 
-    progress_message = await call.message.answer(text="📤 *Експорт почався - 0%*")
+    progress_message = await call.message.edit_text(text="📤 *Експорт почався - 0%*")
     processed = 0
     last_progress = 0
 
