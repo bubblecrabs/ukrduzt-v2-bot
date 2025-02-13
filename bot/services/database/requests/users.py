@@ -1,4 +1,4 @@
-from collections.abc import Sequence
+from typing import AsyncGenerator
 
 from sqlalchemy import select, func, desc, update
 from sqlalchemy.dialects.postgresql import insert
@@ -7,11 +7,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from bot.services.database.models.user import User
 
 
-async def get_users(session: AsyncSession) -> Sequence[User]:
-    """Get all users from the database."""
-    stmt = select(User)
-    result = await session.execute(stmt)
-    return result.scalars().all()
+async def get_users(session: AsyncSession) -> AsyncGenerator[User, None]:
+    """Asynchronously retrieves users from the database using streaming data."""
+    stmt = select(User).execution_options(yield_per=1000, stream_results=True)
+    result = await session.stream(stmt)
+
+    async for row in result.scalars():
+        yield row
 
 
 async def get_user_by_id(session: AsyncSession, user_id: int) -> User:
