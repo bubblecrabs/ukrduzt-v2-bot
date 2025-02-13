@@ -1,24 +1,24 @@
 import json
+from collections.abc import Callable, Coroutine
+from functools import wraps
 
-from redis.asyncio import Redis
+from bot.core.config import settings
+from bot.core.loader import storage
 
 
-class RedisCache:
-    def __init__(self, redis_url: str, ttl: int):
-        """Initializes the Redis cache."""
-        self.redis = Redis.from_url(redis_url, decode_responses=True)
-        self.ttl = ttl
+def cache_response(cache_key_template: str) -> Callable[[Callable[..., Coroutine]], Callable[..., Coroutine]]:
+    """A decorator for caching results of asynchronous functions in Redis."""
+    def decorator(func: Callable[..., Coroutine]) -> Callable[..., Coroutine]:
+        @wraps(func)
+        async def wrapper(*args, **kwargs):
+            cache_key = cache_key_template.format(**kwargs)
+            cached_data = await storage.redis.get(name=cache_key)
+            if cached_data:
+                return json.loads(cached_data)
 
-    async def get(self, key: str):
-        """Retrieves a cached value by key."""
-        value = await self.redis.get(key)
-        return json.loads(value) if value else None
-
-    async def set(self, key: str, value, ttl: int = None):
-        """Sets a value in the cache."""
-        ttl = ttl or self.ttl
-        await self.redis.set(key, json.dumps(value), ex=ttl)
-
-    async def close(self):
-        """Closes the Redis connection."""
-        await self.redis.close()
+            result = await func(*args, **kwargs)
+            if result is not None:
+                await storage.redis.setex(name=cache_key, time=settings.redis.ttl, value=json.dumps(result))
+            return result
+        return wrapper
+    return decorator

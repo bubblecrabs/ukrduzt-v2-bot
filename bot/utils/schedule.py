@@ -22,9 +22,7 @@ def is_weekend() -> bool:
 
 
 async def get_user_group_data(
-        call: CallbackQuery,
-        state: FSMContext,
-        session: AsyncSession
+        call: CallbackQuery, state: FSMContext, session: AsyncSession
 ) -> tuple[str, str, str, str, str, str]:
     """Retrieves and processes user group data based on the callback query and FSM state."""
     if call.message.text == "Виберіть групу ⬇️":

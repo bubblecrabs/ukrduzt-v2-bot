@@ -50,12 +50,7 @@ async def add_user(session: AsyncSession, user_id: int, username: str | None) ->
 
 
 async def update_user(
-        session: AsyncSession,
-        user_id: int,
-        faculty: int,
-        course: int,
-        group: int,
-        group_name: str
+        session: AsyncSession, user_id: int, faculty: int, course: int, group: int, group_name: str
 ) -> None:
     """Update user information if the user exists."""
     stmt = update(User).where(User.user_id == user_id).values(

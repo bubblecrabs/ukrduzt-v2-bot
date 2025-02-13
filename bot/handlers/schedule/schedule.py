@@ -21,19 +21,11 @@ async def get_schedule(call: CallbackQuery, state: FSMContext, session: AsyncSes
     semester = website_settings.semester
 
     faculty, course, group, group_name, selected_day, selected_day_id = await get_user_group_data(
-        session=session,
-        call=call,
-        state=state
+        session=session, call=call, state=state
     )
 
     subjects = await fetch_schedules(
-        week=week,
-        day=selected_day_id,
-        faculty=faculty,
-        course=course,
-        group=group,
-        year_id=year,
-        semester=semester
+        week=week, day=selected_day_id, faculty=faculty, course=course, group=group, year_id=year, semester=semester
     )
 
     text = format_schedule_text(subjects=subjects, week=week, selected_day=selected_day, group_name=group_name)
