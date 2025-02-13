@@ -43,7 +43,7 @@ async def export_users(call: CallbackQuery, session: AsyncSession) -> None:
         await call.message.answer_document(
             document=FSInputFile(file_path),
             caption=(
-                f"📂 *Cписок користувачів:* @{username_bot}\n"
+                f"📂 *Cписок користувачів:* `@{username_bot}`\n"
                 f"🕒 *Дата отримання:* *{datetime.now().strftime('%d.%m.%Y %H:%M')}*"
             )
         )
