@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, date
 
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
@@ -13,6 +13,13 @@ week_days = [
     {"name": "Четвер", "id": "5"},
     {"name": "П'ятниця", "id": "6"},
 ]
+
+
+def get_current_week() -> str:
+    """Get the current week type based on the ISO calendar."""
+    today = date.today()
+    week_number = today.isocalendar()[1]
+    return "Парна" if week_number % 2 != 0 else "Непарна"
 
 
 def is_weekend() -> bool:

@@ -7,7 +7,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from bot.services.database.requests.site import set_year_and_semester
 from bot.services.database.requests.users import add_user, get_user_is_admin
 from bot.keyboards.inline.start import start_kb
-from bot.utils.start import generate_start_text
 
 router = Router()
 
@@ -18,12 +17,11 @@ async def start_command(message: Message, state: FSMContext, session: AsyncSessi
     await state.clear()
 
     await set_year_and_semester(session=session)
-
     await add_user(session=session, user_id=message.from_user.id, username=message.from_user.username)
     is_admin = await get_user_is_admin(session=session, user_id=message.from_user.id)
 
     await message.answer(
-        text=generate_start_text(),
+        text=f"✋ Привіт, я допоможу дізнатися актуальний розклад на тиждень",
         reply_markup=await start_kb(is_admin=is_admin)
     )
 
@@ -34,11 +32,10 @@ async def start_callback(call: CallbackQuery, state: FSMContext, session: AsyncS
     await state.clear()
 
     await set_year_and_semester(session=session)
-
     await add_user(session=session, user_id=call.from_user.id, username=call.from_user.username)
     is_admin = await get_user_is_admin(session=session, user_id=call.from_user.id)
 
     await call.message.edit_text(
-        text=generate_start_text(),
+        text=f"✋ Привіт, я допоможу дізнатися актуальний розклад на тиждень",
         reply_markup=await start_kb(is_admin=is_admin)
     )

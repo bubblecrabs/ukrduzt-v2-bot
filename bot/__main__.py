@@ -43,7 +43,6 @@ def get_routers() -> list[Router]:
 
 async def on_startup() -> None:
     """Function to execute on bot startup."""
-    await bot.delete_webhook(drop_pending_updates=True)
     dp.update.outer_middleware(DbSessionMiddleware())
     dp.include_routers(*get_routers())
 
