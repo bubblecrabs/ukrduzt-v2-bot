@@ -22,7 +22,7 @@ async def manage_admins(call: CallbackQuery, state: FSMContext) -> None:
     await state.set_state(AdminState.func)
 
 
-@router.callback_query(StateFilter(AdminState.func), AdminFilter())
+@router.callback_query(F.data.in_({"add_admin", "delete_admin"}), AdminFilter())
 async def get_admin_id(call: CallbackQuery, state: FSMContext) -> None:
     """Handles for the add_admin and delete_admin callback query."""
     await state.update_data(func=call.data)
