@@ -7,10 +7,11 @@ from bot.core.loader import bot, dp
 from bot.core.config import settings
 
 from bot.middlewares.database import DbSessionMiddleware
-from bot.handlers.admin import panel, stats, export_users, mailing, manage_admins
+from bot.handlers.admin import panel, stats, mailing, manage_admins
 from bot.handlers.admin.site import semester, year
 from bot.handlers.schedule import day, faculty, course, group, schedule
 from bot.handlers.start import start
+from bot.utils.backup import schedule_backup
 
 
 def get_routers() -> list[Router]:
@@ -19,7 +20,6 @@ def get_routers() -> list[Router]:
         "admin_routers": [
             panel.router,
             stats.router,
-            export_users.router,
             mailing.router,
             manage_admins.router,
         ],
@@ -59,7 +59,10 @@ async def main() -> None:
     """Main function to start the bot."""
     dp.startup.register(on_startup)
     dp.shutdown.register(on_shutdown)
-    await dp.start_polling(bot)
+    await asyncio.gather(
+        dp.start_polling(bot),
+        schedule_backup()
+    )
 
 
 if __name__ == "__main__":

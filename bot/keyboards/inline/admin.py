@@ -6,12 +6,11 @@ async def admin_kb() -> InlineKeyboardMarkup:
     kb = InlineKeyboardBuilder()
     kb.add(InlineKeyboardButton(text="👤 Статистика", callback_data="stats_bot"))
     kb.add(InlineKeyboardButton(text="📨 Повідомлення", callback_data="mailing"))
-    kb.add(InlineKeyboardButton(text="📥 Отримати користувачів", callback_data="export_users"))
     kb.add(InlineKeyboardButton(text="🔑 Контроль доступу", callback_data="manage_admins"))
     kb.add(InlineKeyboardButton(text="📅 Оновити рік навчання", callback_data="update_year"))
     kb.add(InlineKeyboardButton(text="🎓 Оновити семестр", callback_data="update_semester"))
     kb.add(InlineKeyboardButton(text="⬅️ Назад", callback_data="start"))
-    kb.adjust(2, 1, 1, 2, 1)
+    kb.adjust(2, 1, 2, 1)
     return kb.as_markup()
 
 

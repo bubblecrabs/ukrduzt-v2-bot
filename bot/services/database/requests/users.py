@@ -1,4 +1,4 @@
-from typing import AsyncGenerator
+from collections.abc import AsyncGenerator, AsyncIterator
 
 from sqlalchemy import select, func, desc, update
 from sqlalchemy.dialects.postgresql import insert
@@ -11,9 +11,16 @@ async def get_users(session: AsyncSession) -> AsyncGenerator[User, None]:
     """Asynchronously retrieves users from the database using streaming data."""
     stmt = select(User).execution_options(yield_per=1000, stream_results=True)
     result = await session.stream(stmt)
-
     async for row in result.scalars():
         yield row
+
+
+async def get_admins(session: AsyncSession) -> AsyncIterator[User]:
+    """Get a list of all administrators in the database."""
+    stmt = select(User).where(User.is_admin == True)
+    result = await session.execute(stmt)
+    for user in result.scalars():
+        yield user
 
 
 async def get_user_by_id(session: AsyncSession, user_id: int) -> User:
