@@ -96,9 +96,11 @@ async def schedule_backup() -> None:
     """Schedules the backup task to run every day at 03:00 UTC."""
     while True:
         now = datetime.now(UTC)
-        next_run = datetime.combine(now.date(), datetime.min.time(), tzinfo=UTC) + timedelta(days=1, hours=3)
-        if now.hour >= 3:
+        next_run = now.replace(hour=3, minute=0, second=0, microsecond=0)
+
+        if now >= next_run:
             next_run += timedelta(days=1)
+
         wait_time = (next_run - now).total_seconds()
         await asyncio.sleep(wait_time)
         await generate_backup()
