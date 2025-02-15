@@ -7,6 +7,7 @@ from bot.core.config import settings
 from bot.middlewares.database import DbSessionMiddleware
 from bot.handlers import get_routers
 from bot.utils.backup import schedule_backup
+from bot.utils.mailing import process_mailing
 
 
 async def on_startup() -> None:
@@ -28,7 +29,8 @@ async def main() -> None:
     dp.shutdown.register(on_shutdown)
     await asyncio.gather(
         dp.start_polling(bot),
-        schedule_backup()
+        schedule_backup(),
+        process_mailing()
     )
 
 

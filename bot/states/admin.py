@@ -14,4 +14,4 @@ class MailingState(StatesGroup):
     media: State = State()
     button_text: State = State()
     button_url: State = State()
-    time: State = State()
+    delay: State = State()
