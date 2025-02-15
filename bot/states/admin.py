@@ -9,6 +9,7 @@ class AdminState(StatesGroup):
 
 class MailingState(StatesGroup):
     """FSM states for the set mailing process."""
+    menu: State = State()
     text: State = State()
     media: State = State()
     button_text: State = State()

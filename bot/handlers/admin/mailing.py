@@ -1,3 +1,5 @@
+import logging
+import validators
 from datetime import datetime
 
 from aiogram import F, Router
@@ -8,16 +10,57 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from bot.filters.admin import AdminFilter
 from bot.filters.datetime import DatetimeFilter
-from bot.keyboards.inline.admin import admin_func_kb, confirm_mailing_kb
-from bot.services.database.requests.users import get_users_count
+from bot.keyboards.inline.admin import admin_func_kb, mailing_menu_kb
 from bot.states.admin import MailingState
 
 router = Router()
 
 
-@router.callback_query(F.data == "mailing", AdminFilter())
-async def mailing(call: CallbackQuery, state: FSMContext) -> None:
-    """Handles for initiating a mailing process."""
+@router.message(StateFilter(MailingState.menu))
+@router.callback_query(F.data == "mailing_menu", AdminFilter())
+async def mailing_menu(event: Message | CallbackQuery, state: FSMContext) -> None:
+    await state.set_state(MailingState.menu)
+    message_data = await state.get_data()
+
+    text = message_data.get("text", "`Не встановлено`")
+    image = message_data.get("image", "`Не встановлено`")
+    scheduled = message_data.get("scheduled", "`Не заплановано`")
+    button_text = message_data.get("button_text", "`Не встановлено`")
+    button_url = message_data.get("button_url", "`Не встановлено`")
+    is_button_set = ("`Встановлено`" if button_text != "`Не встановлено`" else "`Не встановлено`")
+
+    logging.info(repr(image))
+    logging.info(repr(scheduled))
+    logging.info(repr(button_text))
+    logging.info(repr(button_url))
+    logging.info(repr(is_button_set))
+
+    text_message = (
+        f"ℹ️ *Інформація про розсилку:*\n\n"
+        f"✍️ *Текст:* {text}\n"
+        f"🖼 *Зображення:* {image}\n"
+        f"⏹️ *Кнопка під текстом:* {is_button_set}\n"
+        f"💬 *Текст кнопки:* {button_text}\n"
+        f"🔗 *Посилання кнопки:* {button_url}\n"
+        f"⏰ *Запланована розсилка:* {scheduled}\n"
+    )
+
+    if isinstance(event, CallbackQuery):
+        await event.message.edit_text(
+            text=text_message,
+            reply_markup=await mailing_menu_kb(),
+            disable_web_page_preview=True
+        )
+    else:
+        await event.answer(
+            text=text_message,
+            reply_markup=await mailing_menu_kb(),
+            disable_web_page_preview=True
+        )
+
+
+@router.callback_query(F.data == "add_text", AdminFilter())
+async def add_text(call: CallbackQuery, state: FSMContext) -> None:
     await call.message.edit_text(
         text="💬 *Введіть повідомлення для розсилки*",
         reply_markup=await admin_func_kb()
@@ -26,10 +69,63 @@ async def mailing(call: CallbackQuery, state: FSMContext) -> None:
 
 
 @router.message(StateFilter(MailingState.text), AdminFilter())
-async def set_time(message: Message, state: FSMContext) -> None:
-    """Handles the text for the mailing time."""
+async def set_text(message: Message, state: FSMContext) -> None:
     await state.update_data(text=message.text)
-    await message.answer(
+    await state.set_state(MailingState.menu)
+    await mailing_menu(message, state)
+
+
+@router.callback_query(F.data == "add_media", AdminFilter())
+async def add_media(call: CallbackQuery, state: FSMContext) -> None:
+    await call.message.edit_text(
+        text="🖼 *Надішліть зображення для розсилки*",
+        reply_markup=await admin_func_kb()
+    )
+    await state.set_state(MailingState.media)
+
+
+@router.message(StateFilter(MailingState.media), AdminFilter())
+async def set_media(message: Message, state: FSMContext) -> None:
+    if not message.photo:
+        await message.answer("❌ *Надішліть будь ласка зображення.*")
+        return
+
+    photo_id = message.photo[-1].file_id
+    await state.update_data(media=photo_id)
+    await state.set_state(MailingState.menu)
+    await mailing_menu(message, state)
+
+
+@router.callback_query(F.data == "add_button", AdminFilter())
+async def add_button(call: CallbackQuery, state: FSMContext) -> None:
+    await call.message.edit_text(
+        text="🔘 *Введіть текст кнопки*",
+        reply_markup=await admin_func_kb()
+    )
+    await state.set_state(MailingState.button_text)
+
+
+@router.message(StateFilter(MailingState.button_text), AdminFilter())
+async def set_button_text(message: Message, state: FSMContext) -> None:
+    await state.update_data(button_text=message.text)
+    await message.answer(text="🔗 *Введіть URL для кнопки*")
+    await state.set_state(MailingState.button_url)
+
+
+@router.message(StateFilter(MailingState.button_url), AdminFilter())
+async def set_button_url(message: Message, state: FSMContext) -> None:
+    if not validators.url(message.text):
+        await message.answer(text="❌ *Неправильний URL. Введіть коректне посилання.*")
+        return
+
+    await state.update_data(button_url=message.text)
+    await state.set_state(MailingState.button_url)
+    await mailing_menu(message, state)
+
+
+@router.callback_query(F.data == "set_delay", AdminFilter())
+async def add_delay(call: CallbackQuery, state: FSMContext) -> None:
+    await call.message.edit_text(
         text=(
             f"🕒 *Введіть дату і час розсилки*\n\n"
             f"📆 *Формат -* `{datetime.now().strftime('%d.%m.%Y %H:%M')}` *UTC+0*"
@@ -40,21 +136,20 @@ async def set_time(message: Message, state: FSMContext) -> None:
 
 
 @router.message(StateFilter(MailingState.time), AdminFilter(), DatetimeFilter())
-async def confirm_mailing(message: Message, state: FSMContext) -> None:
-    """Handles the validation of mailing time."""
-    await state.update_data(time=message.text)
-    data = await state.get_data()
-
-    await message.answer(
-        text=data["text"],
-        reply_markup=await confirm_mailing_kb()
-    )
+async def set_delay(message: Message, state: FSMContext) -> None:
+    await state.update_data(message.text)
+    await state.set_state(MailingState.menu)
+    await mailing_menu(message, state)
 
 
-@router.callback_query(F.data == "confirmed_mailing")
-async def start_mailing(call: CallbackQuery, state: FSMContext, session: AsyncSession) -> None:
-    count_users = await get_users_count(session=session)
+@router.callback_query(F.data == "reset_mailing", AdminFilter())
+async def reset_mailing(call: CallbackQuery, state: FSMContext) -> None:
+    await state.clear()
+    await state.set_state(MailingState.menu)
+    await mailing_menu(call, state)
 
-    await call.message.answer(
-        text=f"✅ *Розсилку запущено для* `{count_users}` *користувачів*"
-    )
+
+@router.callback_query(F.data == "start_mailing", AdminFilter())
+async def start_mailing(call: CallbackQuery, state: FSMContext) -> None:
+    mailing_message = await state.get_data()
+    pass

@@ -12,30 +12,24 @@ router = Router()
 
 
 @router.message(Command("start"))
-async def start_command(message: Message, state: FSMContext, session: AsyncSession) -> None:
-    """Handles the /start command."""
-    await state.clear()
-
-    await set_year_and_semester(session=session)
-    await add_user(session=session, user_id=message.from_user.id, username=message.from_user.username)
-    is_admin = await get_user_is_admin(session=session, user_id=message.from_user.id)
-
-    await message.answer(
-        text=f"✋ Привіт, я допоможу дізнатися актуальний розклад на тиждень",
-        reply_markup=await start_kb(is_admin=is_admin)
-    )
-
-
 @router.callback_query(F.data == "start")
-async def start_callback(call: CallbackQuery, state: FSMContext, session: AsyncSession) -> None:
-    """Handles the start callback query."""
+async def start_command(event: Message | CallbackQuery, state: FSMContext, session: AsyncSession) -> None:
+    """Handles the start command and callback query."""
     await state.clear()
 
     await set_year_and_semester(session=session)
-    await add_user(session=session, user_id=call.from_user.id, username=call.from_user.username)
-    is_admin = await get_user_is_admin(session=session, user_id=call.from_user.id)
+    await add_user(session=session, user_id=event.from_user.id, username=event.from_user.username)
+    is_admin = await get_user_is_admin(session=session, user_id=event.from_user.id)
 
-    await call.message.edit_text(
-        text=f"✋ Привіт, я допоможу дізнатися актуальний розклад на тиждень",
-        reply_markup=await start_kb(is_admin=is_admin)
-    )
+    text_message = f"✋ Привіт, я допоможу дізнатися актуальний розклад на тиждень"
+
+    if isinstance(event, CallbackQuery):
+        await event.message.edit_text(
+            text=text_message,
+            reply_markup=await start_kb(is_admin=is_admin)
+        )
+    else:
+        await event.answer(
+            text=text_message,
+            reply_markup=await start_kb(is_admin=is_admin)
+        )

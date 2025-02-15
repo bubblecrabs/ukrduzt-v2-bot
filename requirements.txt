@@ -25,4 +25,5 @@ redis==5.2.1
 soupsieve==2.6
 SQLAlchemy==2.0.38
 typing_extensions==4.12.2
+validators==0.34.0
 yarl==1.18.3
