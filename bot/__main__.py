@@ -27,11 +27,11 @@ async def main() -> None:
     """Main function to start the bot."""
     dp.startup.register(on_startup)
     dp.shutdown.register(on_shutdown)
-    await asyncio.gather(
-        dp.start_polling(bot),
-        schedule_backup(),
-        process_mailing()
-    )
+
+    async with asyncio.TaskGroup() as tg:
+        tg.create_task(dp.start_polling(bot))
+        tg.create_task(schedule_backup())
+        tg.create_task(process_mailing())
 
 
 if __name__ == "__main__":
