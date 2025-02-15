@@ -15,12 +15,15 @@ async def stats_bot(call: CallbackQuery, session: AsyncSession) -> None:
     count_users = await get_users_count(session=session)
     latest_user = await get_latest_user(session=session)
 
+    username_or_id = latest_user.username if latest_user.username else latest_user.user_id
+    registration_time = latest_user.created_at.strftime('%d\\.%m\\.%Y %H\\:%M')
+
     await call.message.edit_text(
         text=(
             f"📊 *Статистика*:\n\n"
             f"👥 *Кількість користувачів:* {count_users}\n"
-            f"👤 *Останній зареєстрований:* `{latest_user.username or latest_user.user_id}`\n"
-            f"🕒 *Час реєстрації:* {latest_user.created_at.strftime('%d.%m.%Y %H:%M')}"
+            f"👤 *Останній зареєстрований:* `{username_or_id}`\n"
+            f"🕒 *Час реєстрації:* {registration_time}"
         ),
         reply_markup=await admin_func_kb()
     )

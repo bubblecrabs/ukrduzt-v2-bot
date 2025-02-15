@@ -28,8 +28,8 @@ async def get_admin_id(call: CallbackQuery, state: FSMContext) -> None:
     await state.update_data(func=call.data)
     await call.message.edit_text(
         text=(
-            "✍️ *Введіть ID користувача або адміністратора*\n\n"
-            "🔍 Отримати ID - `@getmyid_bot`"
+            "✍️ *Введіть ID користувача або адміністратора\\.*\n\n"
+            "🔍 Отримати ID \\- `@getmyid_bot`"
         ),
         reply_markup=await admin_func_kb()
     )
@@ -47,10 +47,10 @@ async def set_admin(message: Message, state: FSMContext, session: AsyncSession):
 
         result = await update_admin(session=session, user_id=user_id, set_admin=admin)
         if not result:
-            await message.answer(text=f"🚫 *Користувача не знайдено*")
+            await message.answer(text=f"❌ *Користувача не знайдено\\.*")
         else:
-            await message.answer(text=f"✅ *Статус користувача успішно змінено*")
+            await message.answer(text=f"✅ *Статус користувача успішно змінено\\.*")
     else:
-        await message.answer(text="❓ *Неправильний ID користувача*")
+        await message.answer(text="❌ *Неправильний ID користувача\\.*")
 
     await state.clear()

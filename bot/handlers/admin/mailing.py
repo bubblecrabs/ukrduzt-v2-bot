@@ -2,9 +2,11 @@ import validators
 from datetime import datetime
 
 from aiogram import F, Router
+from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
+from aiogram.utils.markdown import code
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from bot.filters.admin import AdminFilter
@@ -24,21 +26,21 @@ async def mailing_menu(event: Message | CallbackQuery, state: FSMContext) -> Non
     await state.set_state(MailingState.menu)
     message_data = await state.get_data()
 
-    text = message_data.get("text", "`Не встановлено`")
-    image = message_data.get("image", "`Не встановлено`")
-    scheduled = message_data.get("delay", "`Не заплановано`")
-    button_text = message_data.get("button_text", "`Не встановлено`")
-    button_url = message_data.get("button_url", "`Не встановлено`")
+    text = message_data.get("text", "Не встановлено")
+    image = message_data.get("image", "Не встановлено")
+    button_text = message_data.get("button_text", "Не встановлено")
+    button_url = message_data.get("button_url", "Не встановлено")
+    scheduled = message_data.get("delay", "Не заплановано")
     is_button_set = ("`Встановлено`" if button_text != "`Не встановлено`" else "`Не встановлено`")
 
     text_message = (
         f"ℹ️ *Інформація про розсилку:*\n\n"
-        f"✍️ *Текст:* {text}\n"
-        f"🖼 *Зображення:* {image}\n"
+        f"✍️ *Текст:* {code(text)}\n"
+        f"🖼 *Зображення:* {code(image)}\n"
         f"⏹️ *Кнопка під текстом:* {is_button_set}\n"
-        f"💬 *Текст кнопки:* {button_text}\n"
-        f"🔗 *Посилання кнопки:* {button_url}\n"
-        f"⏰ *Запланована розсилка:* {scheduled}\n"
+        f"💬 *Текст кнопки:* {code(button_text)}\n"
+        f"🔗 *Посилання кнопки:* {code(button_url)}\n"
+        f"⏰ *Запланована розсилка:* {code(scheduled)}\n"
     )
 
     if isinstance(event, CallbackQuery):
@@ -59,7 +61,7 @@ async def mailing_menu(event: Message | CallbackQuery, state: FSMContext) -> Non
 async def add_text(call: CallbackQuery, state: FSMContext) -> None:
     """Handles prompting the user to enter the text for the mailing."""
     await call.message.edit_text(
-        text="💬 *Введіть повідомлення для розсилки*",
+        text="💬 *Введіть повідомлення для розсилки\\.*",
         reply_markup=await admin_func_kb()
     )
     await state.set_state(MailingState.text)
@@ -68,6 +70,10 @@ async def add_text(call: CallbackQuery, state: FSMContext) -> None:
 @router.message(StateFilter(MailingState.text), AdminFilter())
 async def set_text(message: Message, state: FSMContext) -> None:
     """Handles saving the entered text for the mailing and returning to the menu."""
+    if len(message.text) > 3700:
+        await message.answer(text="❌ *Максимальна довжина — 3700 символів\\. Спробуйте знову\\.*")
+        return
+
     await state.update_data(text=message.text)
     await state.set_state(MailingState.menu)
     await mailing_menu(message, state)
@@ -77,7 +83,7 @@ async def set_text(message: Message, state: FSMContext) -> None:
 async def add_media(call: CallbackQuery, state: FSMContext) -> None:
     """Handles prompting the user to send an image for the mailing."""
     await call.message.edit_text(
-        text="🖼 *Надішліть зображення для розсилки*",
+        text="🖼 *Надішліть зображення для розсилки\\.*",
         reply_markup=await admin_func_kb()
     )
     await state.set_state(MailingState.media)
@@ -87,7 +93,7 @@ async def add_media(call: CallbackQuery, state: FSMContext) -> None:
 async def set_media(message: Message, state: FSMContext) -> None:
     """Handles saving the image for the mailing and returning to the menu."""
     if not message.photo:
-        await message.answer("❌ *Надішліть будь ласка зображення.*")
+        await message.answer("❌ *Надішліть будь ласка зображення\\.*")
         return
 
     photo_id = message.photo[-1].file_id
@@ -100,7 +106,7 @@ async def set_media(message: Message, state: FSMContext) -> None:
 async def add_button(call: CallbackQuery, state: FSMContext) -> None:
     """Handles prompting the user to enter the button text for the mailing."""
     await call.message.edit_text(
-        text="🔘 *Введіть текст кнопки*",
+        text="🔘 *Введіть текст кнопки\\.*",
         reply_markup=await admin_func_kb()
     )
     await state.set_state(MailingState.button_text)
@@ -109,8 +115,12 @@ async def add_button(call: CallbackQuery, state: FSMContext) -> None:
 @router.message(StateFilter(MailingState.button_text), AdminFilter())
 async def set_button_text(message: Message, state: FSMContext) -> None:
     """Handles saving the button text and prompting the user to enter the button URL."""
+    if len(message.text) > 35:
+        await message.answer(text="❌ *Максимальна довжина — 35 символів\\. Спробуйте знову\\.*")
+        return
+
     await state.update_data(button_text=message.text)
-    await message.answer(text="🔗 *Введіть URL для кнопки*")
+    await message.answer(text="🔗 *Введіть URL для кнопки\\.*")
     await state.set_state(MailingState.button_url)
 
 
@@ -118,7 +128,7 @@ async def set_button_text(message: Message, state: FSMContext) -> None:
 async def set_button_url(message: Message, state: FSMContext) -> None:
     """Handles validating and saving the button URL, then returning to the menu."""
     if not validators.url(message.text):
-        await message.answer(text="❌ *Неправильний URL. Введіть коректне посилання.*")
+        await message.answer(text="❌ *Невірний URL\\. Введіть коректне посилання\\.*")
         return
 
     await state.update_data(button_url=message.text)
@@ -131,8 +141,8 @@ async def add_delay(call: CallbackQuery, state: FSMContext) -> None:
     """Handles prompting the user to enter the delay for the scheduled mailing."""
     await call.message.edit_text(
         text=(
-            f"🕒 *Введіть дату і час розсилки*\n\n"
-            f"📆 *Формат -* `{datetime.now().strftime('%d.%m.%Y %H:%M')}` *UTC+0*"
+            f"🕒 *Введіть дату і час розсилки\\.*\n\n"
+            f"📆 *Формат \\-* `{datetime.now().strftime('%d\\.%m\\.%Y %H\\:%M')}` *UTC\\+0*"
         ),
         reply_markup=await admin_func_kb()
     )
@@ -150,9 +160,12 @@ async def set_delay(message: Message, state: FSMContext) -> None:
 @router.callback_query(F.data == "reset_mailing", AdminFilter())
 async def reset_mailing(call: CallbackQuery, state: FSMContext) -> None:
     """Handles resetting all mailing settings and returning to the menu."""
-    await state.clear()
-    await state.set_state(MailingState.menu)
-    await mailing_menu(call, state)
+    try:
+        await state.clear()
+        await state.set_state(MailingState.menu)
+        await mailing_menu(call, state)
+    except TelegramBadRequest:
+        return
 
 
 @router.callback_query(F.data == "start_mailing", AdminFilter())
@@ -167,9 +180,9 @@ async def start_mailing(call: CallbackQuery, state: FSMContext, session: AsyncSe
     delay = message_data.get("delay")
 
     if not text and not image:
-        await call.message.answer(text="❌ *Ви не встановили текст або зображення для розсилки.*")
+        await call.message.answer(text="❌ *Ви не встановили текст або зображення для розсилки\\.*")
     else:
-        await call.message.edit_text(text="✅ *Розсилку запущено!*")
+        await call.message.edit_text(text="✅ *Розсилку запущено\\.*")
         async for user in get_users(session):
             mailing_data = {
                 "chat_id": str(user.user_id),

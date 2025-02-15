@@ -61,21 +61,18 @@ async def get_user_group_data(
 
 def format_schedule_text(subjects: dict[int, str], week: str, selected_day: str, group_name: str) -> str:
     """Formats the schedule text based on the provided data."""
-    if subjects:
-        week_str = "наступний" if is_weekend() else "цей"
-        subjects_text = "\n".join(f"{sid}: *{sname}*" for sid, sname in subjects.items())
-        return (
-            f"🔔 Показано розклад на *{week_str}* тиждень\n\n"
-            f"{subjects_text}\n\n"
-            f"⏰ Вибраний день - *{selected_day}*\n"
-            f"📆 Поточна неділя - *{week}*\n"
-            f"💼 Вибрана група - *{group_name}*"
-        )
-    return (
-            f"🔍 На *цей* день ваш розклад вільний\n\n"
-            f"⏰ Вибраний день - *{selected_day}*\n"
-            f"📆 Поточна неділя - *{week}*\n"
-            f"💼 Вибрана група - *{group_name}*"
+    week_str = "наступний" if is_weekend() else "цей"
+    subjects_text = "\n".join(f"{sid}: *{sname}*" for sid, sname in subjects.items())
+
+    template = (
+        f"🔔 Показано розклад на *{week_str}* тиждень.\n\n"
+        f"{subjects_text}\n\n" if subjects_text
+        else "🔍 На *цей* день ваш розклад вільний.\n\n"
+    )
+    return template + (
+        f"⏰ Вибраний день - *{selected_day}*\n"
+        f"📆 Поточна неділя - *{week}*\n"
+        f"💼 Вибрана група - *{group_name}*"
     )
 
 

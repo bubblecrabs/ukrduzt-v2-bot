@@ -16,7 +16,7 @@ router = Router()
 async def get_year(call: CallbackQuery, state: FSMContext) -> None:
     """Handles year update request."""
     await call.message.edit_text(
-        text="✍️ *Введіть* `year_id`*, який вказаний на сайті*",
+        text="✍️ *Введіть* `year_id`*, який вказаний на сайті\\.*",
         reply_markup=await admin_func_kb()
     )
     await state.set_state(SiteState.year)
@@ -27,12 +27,12 @@ async def set_year(message: Message, state: FSMContext, session: AsyncSession) -
     """Handles process year update."""
     if message.text.isdigit():
         await update_year(session=session, year=int(message.text))
-        await message.answer(text="✅ *Рік навчання успішно змінено*")
+        await message.answer(text="✅ *Рік навчання успішно змінено\\.*")
         await state.clear()
     else:
         await message.answer(
             text=(
-                "❓ *Неправильний формат*\n\n"
+                "❌ *Неправильний формат\\.*\n\n"
                 "❗️ *Рік навчання має бути, наприклад:* `82`"
             )
         )

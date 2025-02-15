@@ -1,6 +1,8 @@
 import asyncio
 import logging
 
+from aiogram.exceptions import TelegramBadRequest, TelegramForbiddenError
+
 from bot.core.loader import bot, storage
 
 STREAM_NAME = "mailing_stream"
@@ -37,14 +39,27 @@ async def process_mailing() -> None:
 
                     try:
                         if image:
-                            await bot.send_photo(chat_id=chat_id, photo=image, caption=text, reply_markup=reply_markup)
+                            await bot.send_photo(
+                                chat_id=chat_id,
+                                photo=image,
+                                caption=text,
+                                reply_markup=reply_markup,
+                                parse_mode=None
+                            )
                         else:
-                            await bot.send_message(chat_id=chat_id, text=text, reply_markup=reply_markup)
-                        logging.info(f"Sent message to {chat_id}")
+                            await bot.send_message(
+                                chat_id=chat_id,
+                                text=text,
+                                reply_markup=reply_markup,
+                                parse_mode=None
+                            )
+
                     except Exception as e:
-                        logging.error(f"Failed to send message to {chat_id}: {e}")
+                        logging.error(f"Failed to send message to {chat_id}. {e}")
+                    except TelegramForbiddenError:
+                        logging.error(f"Failed to send message to {chat_id}. User blocked the bot")
 
                     await storage.redis.xdel(STREAM_NAME, entry_id)
         except Exception as e:
             logging.error(f"Error processing mailing: {e}")
-        await asyncio.sleep(0.5)
+        await asyncio.sleep(1)

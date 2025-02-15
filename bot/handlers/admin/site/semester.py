@@ -16,7 +16,7 @@ router = Router()
 async def get_semester(call: CallbackQuery, state: FSMContext) -> None:
     """Handles semester update request."""
     await call.message.edit_text(
-        text="✍️ *Введіть* `semester_id`*, який вказаний на сайті*",
+        text="✍️ *Введіть* `semester_id`*, який вказаний на сайті\\.*",
         reply_markup=await admin_func_kb()
     )
     await state.set_state(SiteState.semester)
@@ -27,11 +27,11 @@ async def set_semester(message: Message, state: FSMContext, session: AsyncSessio
     """Handles process semester update."""
     if message.text.isdigit() and message.text in {"1", "2"}:
             await update_semester(session=session, semester=int(message.text))
-            await message.answer(text="✅ *Семестр успішно змінено*")
+            await message.answer(text="✅ *Семестр успішно змінено\\.*")
     else:
         await message.answer(
             text=(
-                "❓ *Неправильний формат*\n\n"
+                "❌ *Неправильний формат\\.*\n\n"
                 "❗️ *Семестр має бути, наприклад:* `1` або `2`"
             )
         )

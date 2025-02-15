@@ -92,7 +92,6 @@ async def generate_backup() -> None:
         await send_file_to_admins(filename, file_data, username_bot)
 
 
-
 async def schedule_backup() -> None:
     """Schedules the backup task to run every day at 03:00 UTC."""
     while True:

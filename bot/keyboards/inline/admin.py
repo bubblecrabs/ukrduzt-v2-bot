@@ -33,6 +33,7 @@ async def manage_admins_kb() -> InlineKeyboardMarkup:
 
 
 async def mailing_menu_kb() -> InlineKeyboardMarkup:
+    """Generates the keyboard for the mailing menu."""
     kb = InlineKeyboardBuilder()
     kb.add(InlineKeyboardButton(text="📥 Почати розсилку", callback_data="start_mailing"))
     kb.add(InlineKeyboardButton(text="✍️ Текст", callback_data="add_text"))

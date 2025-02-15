@@ -1,4 +1,5 @@
 from aiogram import F, Router
+from aiogram.enums.parse_mode import ParseMode
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -28,5 +29,5 @@ async def get_schedule(call: CallbackQuery, state: FSMContext, session: AsyncSes
     )
 
     text = format_schedule_text(subjects=subjects, week=week, selected_day=selected_day, group_name=group_name)
-    await call.message.edit_text(text=text)
+    await call.message.edit_text(text=text, parse_mode=ParseMode.MARKDOWN)
     await state.clear()
