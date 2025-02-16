@@ -65,9 +65,9 @@ def format_schedule_text(subjects: dict[int, str], week: str, selected_day: str,
     subjects_text = "\n".join(f"{sid}: *{sname}*" for sid, sname in subjects.items())
 
     template = (
-        f"🔔 Показано розклад на *{week_str}* тиждень.\n\n"
+        f"🔔 Показано розклад на *{week_str}* тиждень!\n\n"
         f"{subjects_text}\n\n" if subjects_text
-        else "🔍 На *цей* день ваш розклад вільний.\n\n"
+        else "🔍 На *цей* день ваш розклад вільний!\n\n"
     )
     return template + (
         f"⏰ Вибраний день - *{selected_day}*\n"

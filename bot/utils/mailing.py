@@ -1,3 +1,4 @@
+import re
 import asyncio
 import logging
 from datetime import datetime, timezone
@@ -8,6 +9,11 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from bot.core.loader import bot, storage
 
 STREAM_NAME = "mailing_stream"
+
+
+def decode_markdown_v2(text: str) -> str:
+    """Decodes Markdown V2 formatted text by removing escape characters."""
+    return re.sub(r'\\([_*[\]()~`>#+\-=|{}.!])', r'\1', text)
 
 
 def generate_reply_markup(button_text: str, button_url: str) -> InlineKeyboardMarkup | None:
@@ -27,9 +33,9 @@ async def calculate_delay_seconds(delay: str) -> int:
 async def send_message(chat_id, text, image, reply_markup):
     """Sends a message to the user."""
     if image:
-        await bot.send_photo(chat_id=chat_id, photo=image, caption=text, reply_markup=reply_markup, parse_mode=None)
+        await bot.send_photo(chat_id=chat_id, photo=image, caption=text, reply_markup=reply_markup)
     else:
-        await bot.send_message(chat_id=chat_id, text=text, reply_markup=reply_markup, parse_mode=None)
+        await bot.send_message(chat_id=chat_id, text=text, reply_markup=reply_markup)
 
 
 async def create_mailing_task(mailing_data: dict) -> None:
@@ -52,9 +58,9 @@ async def process_message(entry_id, data):
     chat_id = data.get("chat_id")
     text = data.get("text", "")
     image = data.get("image")
-    button_text = data.get("button_text")
-    button_url = data.get("button_url")
-    delay = data.get("delay")
+    button_text = decode_markdown_v2(data.get("button_text"))
+    button_url = decode_markdown_v2(data.get("button_url"))
+    delay = decode_markdown_v2(data.get("delay"))
 
     if delay:
         delay_seconds = await calculate_delay_seconds(delay)

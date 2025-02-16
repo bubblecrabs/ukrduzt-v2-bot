@@ -21,7 +21,7 @@ async def start_command(event: Message | CallbackQuery, state: FSMContext, sessi
     await add_user(session=session, user_id=event.from_user.id, username=event.from_user.username)
     is_admin = await get_user_is_admin(session=session, user_id=event.from_user.id)
 
-    text_message = f"✋ Привіт, я допоможу дізнатися актуальний розклад на тиждень\\."
+    text_message = f"✋ Привіт, я допоможу дізнатися актуальний розклад на тиждень\\!"
 
     if isinstance(event, CallbackQuery):
         await event.message.edit_text(

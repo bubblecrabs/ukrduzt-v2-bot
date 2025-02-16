@@ -1,4 +1,3 @@
-import validators
 from datetime import datetime
 
 from aiogram import F, Router
@@ -6,8 +5,8 @@ from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
-from aiogram.utils.markdown import code
 from sqlalchemy.ext.asyncio import AsyncSession
+from validators import url
 
 from bot.filters.admin import AdminFilter
 from bot.filters.datetime import DatetimeFilter
@@ -31,16 +30,16 @@ async def mailing_menu(event: Message | CallbackQuery, state: FSMContext) -> Non
     button_text = message_data.get("button_text", "Не встановлено")
     button_url = message_data.get("button_url", "Не встановлено")
     scheduled = message_data.get("delay", "Не заплановано")
-    is_button_set = ("`Встановлено`" if button_text != "`Не встановлено`" else "`Не встановлено`")
+    is_button_set = "Встановлено" if button_text != "Не встановлено" else "Не встановлено"
 
     text_message = (
         f"ℹ️ *Інформація про розсилку:*\n\n"
-        f"✍️ *Текст:* {code(text)}\n"
-        f"🖼 *Зображення:* {code(image)}\n"
+        f"✍️ *Текст:* {text}\n"
+        f"🖼 *Зображення:* {image}\n"
         f"⏹️ *Кнопка під текстом:* {is_button_set}\n"
-        f"💬 *Текст кнопки:* {code(button_text)}\n"
-        f"🔗 *Посилання кнопки:* {code(button_url)}\n"
-        f"⏰ *Запланована розсилка:* {code(scheduled)}\n"
+        f"💬 *Текст кнопки:* {button_text}\n"
+        f"🔗 *Посилання кнопки:* {button_url}\n"
+        f"⏰ *Запланована розсилка:* {scheduled}\n"
     )
 
     if isinstance(event, CallbackQuery):
@@ -74,7 +73,7 @@ async def set_text(message: Message, state: FSMContext) -> None:
         await message.answer(text="❌ *Максимальна довжина — 3700 символів\\. Спробуйте знову\\.*")
         return
 
-    await state.update_data(text=message.text)
+    await state.update_data(text=message.md_text)
     await state.set_state(MailingState.menu)
     await mailing_menu(message, state)
 
@@ -119,7 +118,7 @@ async def set_button_text(message: Message, state: FSMContext) -> None:
         await message.answer(text="❌ *Максимальна довжина — 35 символів\\. Спробуйте знову\\.*")
         return
 
-    await state.update_data(button_text=message.text)
+    await state.update_data(button_text=message.md_text)
     await message.answer(text="🔗 *Введіть URL для кнопки\\.*")
     await state.set_state(MailingState.button_url)
 
@@ -127,11 +126,11 @@ async def set_button_text(message: Message, state: FSMContext) -> None:
 @router.message(StateFilter(MailingState.button_url), AdminFilter())
 async def set_button_url(message: Message, state: FSMContext) -> None:
     """Handles validating and saving the button URL, then returning to the menu."""
-    if not validators.url(message.text):
+    if not url(message.text):
         await message.answer(text="❌ *Невірний URL\\. Введіть коректне посилання\\.*")
         return
 
-    await state.update_data(button_url=message.text)
+    await state.update_data(button_url=message.md_text)
     await state.set_state(MailingState.button_url)
     await mailing_menu(message, state)
 
@@ -152,7 +151,7 @@ async def add_delay(call: CallbackQuery, state: FSMContext) -> None:
 @router.message(StateFilter(MailingState.delay), AdminFilter(), DatetimeFilter())
 async def set_delay(message: Message, state: FSMContext) -> None:
     """Handles saving the scheduled delay for the mailing and returning to the menu."""
-    await state.update_data(delay=message.text)
+    await state.update_data(delay=message.md_text)
     await state.set_state(MailingState.menu)
     await mailing_menu(message, state)
 
@@ -182,7 +181,7 @@ async def start_mailing(call: CallbackQuery, state: FSMContext, session: AsyncSe
     if not text and not image:
         await call.message.answer(text="❌ *Ви не встановили текст або зображення для розсилки\\.*")
     else:
-        await call.message.edit_text(text="✅ *Розсилку запущено\\.*")
+        await call.message.edit_text(text="✅ *Розсилку запущено\\!*")
         async for user in get_users(session):
             mailing_data = {
                 "chat_id": str(user.user_id),
