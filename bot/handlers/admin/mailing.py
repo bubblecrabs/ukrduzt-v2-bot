@@ -141,7 +141,7 @@ async def add_delay(call: CallbackQuery, state: FSMContext) -> None:
     await call.message.edit_text(
         text=(
             f"🕒 *Введіть дату і час розсилки\\.*\n\n"
-            f"📆 *Формат \\-* `{datetime.now().strftime('%d\\.%m\\.%Y %H\\:%M')}` *UTC\\+0*"
+            f"📆 *Формат \\-* `{datetime.now().strftime('%d\\.%m\\.%Y %H:%M')}` *UTC\\+0*"
         ),
         reply_markup=await admin_func_kb()
     )

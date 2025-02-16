@@ -57,7 +57,7 @@ async def send_file_to_admins(filename: str, file_data: bytes, username_bot: str
                 document=BufferedInputFile(file_data, filename=filename),
                 caption=(
                     f"📂 *Автоматичний бекап користувачів:* `@{username_bot}`\n"
-                    f"🕒 *Дата отримання:* *{datetime.now().strftime('%d.%m.%Y %H:%M')}*"
+                    f"🕒 *Дата отримання:* *{datetime.now().strftime('%d\\.%m\\.%Y %H:%M')}*"
                 )
             )
 

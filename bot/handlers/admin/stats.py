@@ -16,7 +16,7 @@ async def stats_bot(call: CallbackQuery, session: AsyncSession) -> None:
     latest_user = await get_latest_user(session=session)
 
     username_or_id = latest_user.username if latest_user.username else latest_user.user_id
-    registration_time = latest_user.created_at.strftime('%d\\.%m\\.%Y %H\\:%M')
+    registration_time = latest_user.created_at.strftime('%d\\.%m\\.%Y %H:%M')
 
     await call.message.edit_text(
         text=(
