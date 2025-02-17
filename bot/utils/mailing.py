@@ -1,19 +1,22 @@
 import re
 import asyncio
-import logging
 from datetime import datetime, timezone
 
 from aiogram.exceptions import TelegramBadRequest, TelegramForbiddenError
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from faststream import FastStream, Logger
+from faststream.redis import RedisBroker
 
-from bot.core.loader import bot, storage
+from bot.core.config import settings
+from bot.core.loader import bot
 
-STREAM_NAME = "mailing_stream"
+broker = RedisBroker(url=settings.redis.url)
+app = FastStream(broker)
 
 
-def decode_markdown_v2(text: str) -> str:
+def decode_markdown_v2(text: str | None) -> str:
     """Decodes Markdown V2 formatted text by removing escape characters."""
-    return re.sub(r'\\([_*[\]()~`>#+\-=|{}.!])', r'\1', text)
+    return re.sub(r'\\([_*\[\]()~`>#+\-=|{}.!])', r'\1', text) if text else ""
 
 
 def generate_reply_markup(button_text: str, button_url: str) -> InlineKeyboardMarkup | None:
@@ -30,33 +33,26 @@ async def calculate_delay_seconds(delay: str) -> int:
     return max(0, int((scheduled_time - now).total_seconds()))
 
 
-async def send_message(chat_id, text, image, reply_markup):
+async def send_message(
+    chat_id: str, text: str, image: str | None, reply_markup: InlineKeyboardMarkup | None, logger: Logger
+) -> None:
     """Sends a message to the user."""
-    if image:
-        await bot.send_photo(chat_id=chat_id, photo=image, caption=text, reply_markup=reply_markup)
-    else:
-        await bot.send_message(chat_id=chat_id, text=text, reply_markup=reply_markup)
-
-
-async def create_mailing_task(mailing_data: dict) -> None:
-    """Pushes mailing data to Redis Stream."""
-    converted_data = {k: "" if v is None else v for k, v in mailing_data.items()}
-    await storage.redis.xadd(STREAM_NAME, converted_data)
-
-
-async def fetch_mailing_messages() -> list:
-    """Fetches messages from Redis Stream."""
     try:
-        return await storage.redis.xread({STREAM_NAME: "0"}, count=10, block=5000)
-    except Exception as e:
-        logging.error(f"Error fetching messages: {e}")
-        return []
+        if image:
+            await bot.send_photo(chat_id=chat_id, photo=image, caption=text, reply_markup=reply_markup)
+        else:
+            await bot.send_message(chat_id=chat_id, text=text, reply_markup=reply_markup)
+    except TelegramForbiddenError:
+        logger.error(f"Failed to send message to {chat_id}. User blocked the bot.")
+    except TelegramBadRequest as e:
+        logger.error(f"Failed to send message to {chat_id}. {e}")
 
 
-async def process_message(entry_id, data):
+@broker.subscriber("mailing_stream")
+async def process_message(data: dict, logger: Logger) -> None:
     """Processes and sends an individual message."""
     chat_id = data.get("chat_id")
-    text = data.get("text", "")
+    text = data.get("text")
     image = data.get("image")
     button_text = decode_markdown_v2(data.get("button_text"))
     button_url = decode_markdown_v2(data.get("button_url"))
@@ -68,26 +64,14 @@ async def process_message(entry_id, data):
             await asyncio.sleep(delay_seconds)
 
     reply_markup = generate_reply_markup(button_text, button_url)
+    await send_message(chat_id, text, image, reply_markup, logger)
 
-    try:
-        await send_message(chat_id, text, image, reply_markup)
-    except TelegramForbiddenError:
-        logging.error(f"Failed to send message to {chat_id}. User blocked the bot.")
-    except TelegramBadRequest as e:
-        logging.error(f"Failed to send message to {chat_id}. {e}")
-    finally:
-        await storage.redis.xdel(STREAM_NAME, entry_id)
+
+@app.after_startup
+async def create_mailing_task(mailing_data: dict) -> None:
+    """Pushes mailing data to Redis Stream."""
+    await broker.publish(mailing_data, "mailing_stream")
 
 
 async def process_mailing() -> None:
-    """Processes messages from Redis Stream and sends them to users."""
-    while True:
-        messages = await fetch_mailing_messages()
-        for stream, entries in messages:
-            for entry_id, entry in entries:
-                try:
-                    data = {k.decode(): v.decode() for k, v in entry.items()}
-                    await process_message(entry_id, data)
-                except Exception as e:
-                    logging.error(f"Error processing message: {e}")
-        await asyncio.sleep(1)
+    await broker.start()

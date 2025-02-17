@@ -2,10 +2,8 @@ import asyncio
 import logging
 
 from bot.core.loader import bot, dp
-from bot.core.config import settings
-
-from bot.middlewares.database import DbSessionMiddleware
 from bot.handlers import get_routers
+from bot.middlewares.database import DbSessionMiddleware
 from bot.utils.backup import schedule_backup
 from bot.utils.mailing import process_mailing
 
@@ -36,7 +34,7 @@ async def main() -> None:
 
 if __name__ == "__main__":
     logging.basicConfig(
-        level=settings.logging.level,
+        level=logging.INFO,
         format="%(asctime)s - %(levelname)s - %(message)s",
         datefmt="%Y-%m-%d %H:%M:%S"
     )

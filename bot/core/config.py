@@ -13,13 +13,8 @@ class BotSettings(EnvBaseSettings):
     token: SecretStr = Field(alias="BOT_TOKEN")
 
 
-class LoggingSettings(EnvBaseSettings):
-    level: int = Field(alias="LOG_LEVEL")
-
-
 class Settings(EnvBaseSettings):
     bot: BotSettings = Field(default_factory=BotSettings)
-    logging: LoggingSettings = Field(default_factory=LoggingSettings)
     postgres: PostgresSettings = Field(default_factory=PostgresSettings)
     redis: RedisSettings = Field(default_factory=RedisSettings)
 
