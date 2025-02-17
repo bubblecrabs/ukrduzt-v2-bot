@@ -6,14 +6,13 @@ from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 from sqlalchemy.ext.asyncio import AsyncSession
-from validators import url
 
 from bot.filters.admin import AdminFilter
 from bot.filters.datetime import DatetimeFilter
 from bot.keyboards.inline.admin import admin_func_kb, mailing_menu_kb
 from bot.services.database.requests.users import get_users
 from bot.states.admin import MailingState
-from bot.utils.mailing import create_mailing_task
+from bot.utils.mailing import create_mailing_task, validate_url
 
 router = Router()
 
@@ -126,7 +125,7 @@ async def set_button_text(message: Message, state: FSMContext) -> None:
 @router.message(StateFilter(MailingState.button_url), AdminFilter())
 async def set_button_url(message: Message, state: FSMContext) -> None:
     """Handles validating and saving the button URL, then returning to the menu."""
-    if not url(message.text):
+    if not validate_url(message.text):
         await message.answer(text="❌ *Невірний URL\\. Введіть коректне посилання\\.*")
         return
 
@@ -180,8 +179,13 @@ async def start_mailing(call: CallbackQuery, state: FSMContext, session: AsyncSe
 
     if not text and not image:
         await call.message.answer(text="❌ *Ви не встановили текст або зображення для розсилки\\.*")
+
     else:
-        await call.message.edit_text(text="✅ *Розсилку запущено\\!*")
+        if delay:
+            await call.message.edit_text(text="✅ *Розсилка успішно відкладена\\!*")
+        else:
+            await call.message.edit_text(text="✅ *Розсилку запущено\\!*")
+
         async for user in get_users(session):
             mailing_data = {
                 "chat_id": str(user.user_id),
